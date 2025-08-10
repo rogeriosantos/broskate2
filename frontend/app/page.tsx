@@ -1,9 +1,25 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { MapPinIcon, BuildingStorefrontIcon, UserGroupIcon } from '@heroicons/react/24/outline'
+import { useGuestAnalytics } from '@/lib/hooks/useGuestAnalytics'
 
 export default function HomePage() {
+  const { trackPageView, trackSignupPromptClick } = useGuestAnalytics()
+
+  useEffect(() => {
+    trackPageView('/')
+  }, [trackPageView])
+
+  const handleSignupClick = (location: string) => {
+    trackSignupPromptClick('button', location, 'signup')
+  }
+
+  const handleGuestBrowseClick = () => {
+    trackSignupPromptClick('button', 'hero_cta', 'guest_browse')
+  }
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -22,12 +38,14 @@ export default function HomePage() {
             <div className="mt-10 flex items-center justify-center gap-4">
               <Link
                 href="/auth/register"
+                onClick={() => handleSignupClick('hero_cta')}
                 className="btn-primary text-lg px-8 py-3"
               >
                 Get Started
               </Link>
               <Link
                 href="/spots"
+                onClick={handleGuestBrowseClick}
                 className="btn-outline border-white text-white hover:bg-white hover:text-gray-900 text-lg px-8 py-3"
               >
                 Browse Spots

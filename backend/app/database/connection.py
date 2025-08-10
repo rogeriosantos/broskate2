@@ -25,7 +25,8 @@ async def init_db():
             max_size=20,
             command_timeout=60,
             server_settings={
-                "jit": "off"
+                "jit": "off",
+                "search_path": "broskate, public"
             }
         )
         logger.info("Database connection pool initialized")

@@ -2,76 +2,76 @@
 
 ## Week 1: Database & Backend Foundation
 
-### Task 1.1: Database Setup (2 days)
-- [ ] Create Neon.tech account and project
-- [ ] Set up PostgreSQL database with connection pooling
-- [ ] Create all database tables from schema:
-  - [ ] users table with constraints
-  - [ ] shops table with location indexing  
-  - [ ] skate_spots table with geo-indexing
-  - [ ] shop_memberships table with unique constraints
-  - [ ] spot_checkins table
-- [ ] Create database indexes for performance:
-  - [ ] Location-based indexes (latitude, longitude)
-  - [ ] User lookup indexes (email, username)
-  - [ ] Shop membership queries
-- [ ] Test database connection and basic queries
+### Task 1.1: Database Setup (2 days) ✅ COMPLETED
+- [x] Create Neon.tech account and project
+- [x] Set up PostgreSQL database with connection pooling
+- [x] Create all database tables from schema:
+  - [x] users table with constraints
+  - [x] shops table with location indexing  
+  - [x] skate_spots table with geo-indexing
+  - [x] shop_memberships table with unique constraints
+  - [x] spot_checkins table
+- [x] Create database indexes for performance:
+  - [x] Location-based indexes (latitude, longitude)
+  - [x] User lookup indexes (email, username)
+  - [x] Shop membership queries
+- [x] Test database connection and basic queries
 
-### Task 1.2: FastAPI Backend Setup (3 days)
-- [ ] Initialize FastAPI project with proper structure
-- [ ] Set up asyncpg connection pooling
-- [ ] Create Pydantic models for all entities:
-  - [ ] User schemas (create, update, response)
-  - [ ] Shop schemas
-  - [ ] Spot schemas  
-  - [ ] Authentication schemas
-- [ ] Implement database connection management:
-  - [ ] Connection pool configuration
-  - [ ] Database query utilities
-  - [ ] Error handling for DB operations
-- [ ] Create basic CRUD operations (raw SQL only):
-  - [ ] User operations
-  - [ ] Shop operations
-  - [ ] Spot operations
-- [ ] Add middleware:
-  - [ ] CORS middleware
-  - [ ] Request logging
-  - [ ] Error handling middleware
+### Task 1.2: FastAPI Backend Setup (3 days) ✅ COMPLETED
+- [x] Initialize FastAPI project with proper structure
+- [x] Set up asyncpg connection pooling
+- [x] Create Pydantic models for all entities:
+  - [x] User schemas (create, update, response)
+  - [x] Shop schemas
+  - [x] Spot schemas  
+  - [x] Authentication schemas
+- [x] Implement database connection management:
+  - [x] Connection pool configuration
+  - [x] Database query utilities
+  - [x] Error handling for DB operations
+- [x] Create basic CRUD operations (raw SQL only):
+  - [x] User operations
+  - [x] Shop operations
+  - [x] Spot operations
+- [x] Add middleware:
+  - [x] CORS middleware
+  - [x] Request logging
+  - [x] Error handling middleware
 
 ## Week 2: Authentication & API Development
 
-### Task 2.1: Authentication System (3 days)
-- [ ] Implement JWT token system:
-  - [ ] Token generation and validation
-  - [ ] Token refresh mechanism
-  - [ ] Secure token storage guidelines
-- [ ] Create authentication routes:
-  - [ ] POST /api/auth/register
-  - [ ] POST /api/auth/login
-  - [ ] POST /api/auth/refresh
-  - [ ] POST /api/auth/logout
-- [ ] Implement guest access system:
-  - [ ] Guest browsing without tokens
-  - [ ] Feature restrictions for guests
-  - [ ] Guest to user conversion flow
-- [ ] Add password hashing with bcrypt
-- [ ] Implement authentication decorators/dependencies
+### Task 2.1: Authentication System (3 days) ✅ COMPLETED
+- [x] Implement JWT token system:
+  - [x] Token generation and validation
+  - [x] Token refresh mechanism
+  - [x] Secure token storage guidelines
+- [x] Create authentication routes:
+  - [x] POST /api/auth/register
+  - [x] POST /api/auth/login
+  - [x] POST /api/auth/refresh
+  - [x] POST /api/auth/logout
+- [x] Implement guest access system:
+  - [x] Guest browsing without tokens
+  - [x] Feature restrictions for guests
+  - [x] Guest to user conversion flow
+- [x] Add password hashing with bcrypt
+- [x] Implement authentication decorators/dependencies
 
-### Task 2.2: Core API Endpoints (2 days)
-- [ ] User management endpoints:
-  - [ ] GET /api/users/profile (authenticated)
-  - [ ] PUT /api/users/profile (authenticated)
-  - [ ] GET /api/users/{user_id} (public)
-- [ ] Shop endpoints:
-  - [ ] GET /api/shops (with pagination)
-  - [ ] POST /api/shops (authenticated)
-  - [ ] GET /api/shops/{shop_id}
-- [ ] Spot endpoints:
-  - [ ] GET /api/spots (with geo-filtering)
-  - [ ] POST /api/spots (authenticated)
-  - [ ] GET /api/spots/{spot_id}
-- [ ] Add proper HTTP status codes and error responses
-- [ ] Implement request validation with Pydantic
+### Task 2.2: Core API Endpoints (2 days) ✅ COMPLETED
+- [x] User management endpoints:
+  - [x] GET /api/users/profile (authenticated)
+  - [x] PUT /api/users/profile (authenticated)
+  - [x] GET /api/users/{user_id} (public)
+- [x] Shop endpoints:
+  - [x] GET /api/shops (with pagination)
+  - [x] POST /api/shops (authenticated)
+  - [x] GET /api/shops/{shop_id}
+- [x] Spot endpoints:
+  - [x] GET /api/spots (with geo-filtering)
+  - [x] POST /api/spots (authenticated)
+  - [x] GET /api/spots/{spot_id}
+- [x] Add proper HTTP status codes and error responses
+- [x] Implement request validation with Pydantic
 
 ## Week 3: Deployment & Frontend Setup
 
@@ -86,24 +86,24 @@
 - [ ] Set up monitoring and logging
 - [ ] Configure automatic deployments from Git
 
-### Task 3.2: Next.js Frontend Foundation (3 days)
-- [ ] Initialize Next.js 14+ project with App Router
-- [ ] Configure Tailwind CSS with skateboarding theme:
-  - [ ] Custom color palette
-  - [ ] Typography system
-  - [ ] Component base styles
-- [ ] Set up project structure:
-  - [ ] app/ directory with routing
-  - [ ] components/ directory organization
-  - [ ] lib/ directory for utilities
-- [ ] Configure API client:
-  - [ ] Axios setup with interceptors
-  - [ ] Base URL configuration
-  - [ ] Error handling
-- [ ] Set up state management:
-  - [ ] TanStack Query configuration
-  - [ ] Zustand store setup
-  - [ ] Auth state management
+### Task 3.2: Next.js Frontend Foundation (3 days) ✅ COMPLETED
+- [x] Initialize Next.js 14+ project with App Router
+- [x] Configure Tailwind CSS with skateboarding theme:
+  - [x] Custom color palette
+  - [x] Typography system
+  - [x] Component base styles
+- [x] Set up project structure:
+  - [x] app/ directory with routing
+  - [x] components/ directory organization
+  - [x] lib/ directory for utilities
+- [x] Configure API client:
+  - [x] Axios setup with interceptors
+  - [x] Base URL configuration
+  - [x] Error handling
+- [x] Set up state management:
+  - [x] TanStack Query configuration
+  - [x] Zustand store setup
+  - [x] Auth state management
 
 ### Task 3.3: Frontend Deployment & Integration (2 days)
 - [ ] Deploy to Vercel with environment variables
