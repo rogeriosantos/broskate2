@@ -134,6 +134,7 @@ class SpotBase(BaseModel):
 class SpotCreate(SpotBase):
     latitude: float = Field(..., ge=-90, le=90)
     longitude: float = Field(..., ge=-180, le=180)
+    image_urls: Optional[List[str]] = []
 
 
 class SpotUpdate(BaseModel):

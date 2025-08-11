@@ -15,56 +15,67 @@ router = APIRouter()
 @router.post("/register", response_model=UserResponse)
 async def register(user: UserCreate):
     """Register a new user"""
-    # Check if username already exists
-    existing_user = await execute_single_query(
-        "SELECT id FROM users WHERE username = $1", user.username
-    )
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already registered"
+    try:
+        # Check if username already exists
+        existing_user = await execute_single_query(
+            "SELECT id FROM users WHERE username = $1", user.username
         )
-    
-    # Check if email already exists (if provided)
-    if user.email:
-        existing_email = await execute_single_query(
-            "SELECT id FROM users WHERE email = $1", user.email
-        )
-        if existing_email:
+        if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already registered"
+                detail="Username already registered"
             )
-    
-    # Hash password
-    hashed_password = get_password_hash(user.password)
-    
-    # Insert new user
-    query = """
-    INSERT INTO users (username, email, password_hash, bio, location, skill_level, favorite_tricks)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING id, username, email, profile_image_url, bio, location, skill_level, 
-              favorite_tricks, created_at, is_guest
-    """
-    
-    new_user = await execute_single_query(
-        query, 
-        user.username, 
-        user.email, 
-        hashed_password,
-        user.bio,
-        user.location,
-        user.skill_level.value if user.skill_level else None,
-        user.favorite_tricks or []
-    )
-    
-    if not new_user:
+        
+        # Check if email already exists (if provided)
+        if user.email:
+            existing_email = await execute_single_query(
+                "SELECT id FROM users WHERE email = $1", user.email
+            )
+            if existing_email:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email already registered"
+                )
+        
+        # Hash password
+        hashed_password = get_password_hash(user.password)
+        
+        # Insert new user
+        query = """
+        INSERT INTO users (username, email, password_hash, bio, location, skill_level, favorite_tricks)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id, username, email, profile_image_url, bio, location, skill_level, 
+                  favorite_tricks, created_at, is_guest
+        """
+        
+        new_user = await execute_single_query(
+            query, 
+            user.username, 
+            user.email, 
+            hashed_password,
+            user.bio,
+            user.location,
+            user.skill_level.value if user.skill_level else None,
+            user.favorite_tricks or []
+        )
+        
+        if not new_user:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create user"
+            )
+        
+        return UserResponse(**dict(new_user))
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions (validation errors, etc.)
+        raise
+    except Exception as e:
+        # Catch and return detailed database errors for debugging
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create user"
+            detail=f"Registration failed: {type(e).__name__}: {str(e)}"
         )
-    
-    return UserResponse(**dict(new_user))
 
 
 @router.post("/login", response_model=Token)

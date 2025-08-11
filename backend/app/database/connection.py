@@ -10,6 +10,10 @@ logger = logging.getLogger(__name__)
 _pool: Optional[asyncpg.Pool] = None
 
 
+async def setup_connection(conn):
+    """Setup function called for each new connection"""
+    await conn.execute("SET search_path TO broskate, public")
+
 async def init_db():
     """Initialize database connection pool"""
     global _pool
@@ -24,9 +28,9 @@ async def init_db():
             min_size=5,
             max_size=20,
             command_timeout=60,
+            setup=setup_connection,
             server_settings={
-                "jit": "off",
-                "search_path": "broskate, public"
+                "jit": "off"
             }
         )
         logger.info("Database connection pool initialized")

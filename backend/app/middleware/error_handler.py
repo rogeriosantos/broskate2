@@ -39,8 +39,9 @@ def add_exception_handlers(app: FastAPI):
         return JSONResponse(
             status_code=500,
             content={
-                "detail": "Database error occurred",
-                "error": "DATABASE_ERROR"
+                "detail": "Database error occurred", 
+                "error": "DATABASE_ERROR",
+                "debug_info": str(exc)  # Always show for debugging
             }
         )
     
@@ -52,6 +53,7 @@ def add_exception_handlers(app: FastAPI):
             status_code=500,
             content={
                 "detail": "An unexpected error occurred",
-                "error": "INTERNAL_SERVER_ERROR"
+                "error": "INTERNAL_SERVER_ERROR", 
+                "debug_info": f"{type(exc).__name__}: {str(exc)}"  # Show for debugging
             }
         )

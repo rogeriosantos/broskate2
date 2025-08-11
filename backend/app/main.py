@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from app.database.connection import init_db, close_db
-from app.routes import auth, users, shops, spots
+from app.routes import auth, users, shops, spots, debug
 from app.middleware.error_handler import add_exception_handlers
 from app.middleware.logging import add_logging_middleware
 
@@ -30,7 +30,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://*.vercel.app"],
+    allow_origins=["http://localhost:3000", "http://localhost:3001", "https://*.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,6 +45,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
 app.include_router(users.router, prefix="/api/users", tags=["users"])
 app.include_router(shops.router, prefix="/api/shops", tags=["shops"])
 app.include_router(spots.router, prefix="/api/spots", tags=["spots"])
+app.include_router(debug.router, prefix="/api/debug", tags=["debug"])
 
 
 @app.get("/")
@@ -55,3 +56,10 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "version": "1.0.0"}
+
+@app.get("/api/test-shops/")
+async def test_shops_endpoint():
+    """Working shops endpoint for testing"""
+    print("TEST SHOPS ENDPOINT CALLED!")
+    return {"message": "Test shops endpoint working", "shops": []}
+

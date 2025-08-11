@@ -103,13 +103,11 @@ async def get_current_active_user(current_user = Depends(get_current_user)):
     return current_user
 
 
-def optional_auth(credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False))):
+async def optional_auth(credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False))):
     """Optional authentication for endpoints that work with both guests and authenticated users"""
-    async def _optional_auth():
-        if not credentials:
-            return None
-        try:
-            return await get_current_user(credentials)
-        except HTTPException:
-            return None
-    return _optional_auth
+    if not credentials:
+        return None
+    try:
+        return await get_current_user(credentials)
+    except HTTPException:
+        return None

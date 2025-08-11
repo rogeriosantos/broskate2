@@ -121,8 +121,16 @@ export default function SpotsPage() {
           </p>
         </div>
         
-        {/* Guest Sign Up Prompt */}
-        {!isAuthenticated && (
+        {/* Add Spot Button for authenticated users */}
+        {isAuthenticated ? (
+          <Link 
+            href="/spots/add"
+            className="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors font-medium"
+          >
+            + Add Spot
+          </Link>
+        ) : (
+          /* Guest Sign Up Prompt */
           <div className="bg-gradient-to-r from-green-500 to-blue-600 text-white p-4 rounded-lg shadow-lg">
             <p className="text-sm mb-2">Know a spot?</p>
             <Link 
