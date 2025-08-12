@@ -24,71 +24,74 @@ export function NavBar() {
   ]
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-50 shadow-xl shadow-black/5">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          {/* Logo */}
+          {/* Modern Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">BS</span>
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className="relative">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-neon rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/30 group-hover:scale-105 transition-transform duration-300">
+                  <span className="text-white font-black text-sm">BS</span>
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-neon rounded-full animate-glow-pulse opacity-75" />
               </div>
-              <span className="font-display font-bold text-xl text-gray-900">
+              <span className="font-display font-black text-2xl bg-gradient-to-r from-dark-900 to-primary-600 bg-clip-text text-transparent">
                 BroSkate
               </span>
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden sm:flex sm:items-center sm:space-x-8">
+          {/* Modern Desktop Navigation */}
+          <div className="hidden sm:flex sm:items-center sm:space-x-2">
             {navigation.map((item) => {
               const Icon = item.icon
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="flex items-center space-x-1 text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                  className="group flex items-center space-x-2 text-dark-600 hover:text-primary-600 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-300 hover:bg-primary-50/80"
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
                   <span>{item.name}</span>
                 </Link>
               )
             })}
             
             {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3 ml-4">
                 <Link
                   href="/shops/add"
-                  className="flex items-center space-x-1 bg-primary-600 text-white hover:bg-primary-700 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200"
+                  className="flex items-center space-x-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-primary-500/25"
                 >
                   <PlusIcon className="w-4 h-4" />
                   <span>Add Shop</span>
                 </Link>
                 <Link
                   href="/profile"
-                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                  className="flex items-center space-x-2 text-dark-600 hover:text-primary-600 px-3 py-2 text-sm font-medium rounded-xl hover:bg-dark-50/80 transition-all duration-300"
                 >
                   <UserCircleIcon className="w-5 h-5" />
-                  <span>{user?.username}</span>
+                  <span className="max-w-20 truncate">{user?.username}</span>
                 </Link>
                 <button
                   onClick={logout}
-                  className="btn-ghost text-sm"
+                  className="text-dark-500 hover:text-dark-700 px-3 py-2 text-sm font-medium rounded-xl hover:bg-dark-50/80 transition-all duration-300"
                 >
                   Logout
                 </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3 ml-4">
                 <Link
                   href="/auth/login"
-                  className="btn-ghost text-sm"
+                  className="text-dark-600 hover:text-primary-600 px-4 py-2 text-sm font-semibold rounded-xl hover:bg-primary-50/80 transition-all duration-300"
                 >
                   Login
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="btn-primary text-sm"
+                  className="bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 px-6 py-2 text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-primary-500/25"
                 >
                   Sign Up
                 </Link>

@@ -151,7 +151,7 @@ export default function EditProfilePage() {
     }
     
     if (Object.keys(updateData).length === 0) {
-      toast.info('No changes to save')
+      toast('No changes to save', { icon: 'ℹ️' })
       return
     }
     

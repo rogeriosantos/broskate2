@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 
 /* Base styles */
 @layer base {
@@ -20,38 +21,54 @@
 
 /* Component styles */
 @layer components {
-  /* Button variants */
+  /* Modern Button variants */
   .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-2 transform hover:scale-[1.02] active:scale-[0.98] shadow-sm;
   }
   
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    @apply btn bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 focus:ring-primary-500/50 shadow-lg hover:shadow-xl;
   }
   
   .btn-secondary {
-    @apply btn bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
+    @apply btn bg-gradient-to-r from-dark-100 to-dark-200 text-dark-800 hover:from-dark-200 hover:to-dark-300 focus:ring-dark-500/50 border border-dark-300/50;
   }
   
   .btn-outline {
-    @apply btn border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white focus:ring-primary-500;
+    @apply btn border-2 border-primary-500 text-primary-600 hover:bg-primary-500 hover:text-white focus:ring-primary-500/50 bg-white/90 backdrop-blur-sm;
   }
   
   .btn-ghost {
-    @apply btn text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:ring-gray-500;
+    @apply btn text-dark-600 hover:bg-dark-100/80 hover:text-dark-800 focus:ring-dark-500/50 backdrop-blur-sm;
   }
   
-  .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  .btn-neon {
+    @apply btn bg-gradient-to-r from-neon to-glow text-dark-900 hover:shadow-glow-lg focus:ring-glow/50 font-bold;
   }
   
-  /* Card styles */
+  .btn-brutal {
+    @apply btn bg-black text-white border-4 border-black shadow-brutal-sm hover:shadow-brutal active:shadow-none rounded-none font-bold uppercase tracking-wide;
+  }
+  
+  /* Modern Card styles */
   .card {
-    @apply bg-white rounded-xl border border-gray-200 shadow-sm;
+    @apply bg-white/90 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl shadow-black/5;
   }
   
   .card-hover {
-    @apply card hover:shadow-md hover:border-gray-300 transition-all duration-200;
+    @apply card hover:shadow-2xl hover:shadow-black/10 hover:border-white/40 hover:-translate-y-1 transition-all duration-300 hover:bg-white/95;
+  }
+  
+  .card-glass {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl;
+  }
+  
+  .card-neon {
+    @apply bg-dark-900/90 backdrop-blur-md border border-glow/30 rounded-2xl shadow-glow-lg hover:shadow-glow transition-all duration-300;
+  }
+  
+  .card-brutal {
+    @apply bg-white border-4 border-black shadow-brutal rounded-none;
   }
   
   /* Input styles */
