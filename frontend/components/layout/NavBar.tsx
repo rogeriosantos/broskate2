@@ -8,7 +8,9 @@ import {
   XMarkIcon,
   MapPinIcon,
   BuildingStorefrontIcon,
-  UserCircleIcon
+  UserCircleIcon,
+  UsersIcon,
+  PlusIcon
 } from '@heroicons/react/24/outline'
 
 export function NavBar() {
@@ -18,6 +20,7 @@ export function NavBar() {
   const navigation = [
     { name: 'Spots', href: '/spots', icon: MapPinIcon },
     { name: 'Shops', href: '/shops', icon: BuildingStorefrontIcon },
+    { name: 'Skaters', href: '/skaters', icon: UsersIcon },
   ]
 
   return (
@@ -54,6 +57,13 @@ export function NavBar() {
             
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
+                <Link
+                  href="/shops/add"
+                  className="flex items-center space-x-1 bg-primary-600 text-white hover:bg-primary-700 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200"
+                >
+                  <PlusIcon className="w-4 h-4" />
+                  <span>Add Shop</span>
+                </Link>
                 <Link
                   href="/profile"
                   className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
@@ -125,6 +135,14 @@ export function NavBar() {
             <div className="pt-4 border-t border-gray-200">
               {isAuthenticated ? (
                 <>
+                  <Link
+                    href="/shops/add"
+                    className="flex items-center space-x-2 bg-primary-600 text-white hover:bg-primary-700 px-3 py-2 text-base font-medium rounded-lg"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <PlusIcon className="w-5 h-5" />
+                    <span>Add Shop</span>
+                  </Link>
                   <Link
                     href="/profile"
                     className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 text-base font-medium rounded-lg"
