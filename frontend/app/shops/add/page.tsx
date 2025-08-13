@@ -9,6 +9,15 @@ import { ArrowLeftIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
 export default function AddShopPage() {
+  // Prevent SSR execution of client-side code
+  if (typeof window === 'undefined') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+      </div>
+    )
+  }
+
   const router = useRouter()
   const { isAuthenticated, isLoading: authLoading } = useAuthStore()
   

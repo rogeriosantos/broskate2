@@ -25,6 +25,15 @@ const COMMON_TRICKS = [
 ]
 
 export default function EditProfilePage() {
+  // Prevent SSR execution of client-side code
+  if (typeof window === 'undefined') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+      </div>
+    )
+  }
+
   const router = useRouter()
   const queryClient = useQueryClient()
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStore()
