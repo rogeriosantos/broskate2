@@ -149,6 +149,7 @@ export const shopsApi = {
     longitude?: number
     radius_km?: number
     search?: string
+    owner_id?: number
   }) => api.get<ApiResponse<{ shops: Shop[]; total: number }>>('/api/shops', { params }),
     
   createShop: (data: Partial<Shop>) => api.post<ApiResponse<Shop>>('/api/shops', data),
@@ -180,9 +181,18 @@ export const eventsApi = {
     event_type?: string
     start_date?: string
     end_date?: string
+    organizer_id?: number
+    attending_user_id?: number
   }) => api.get<ApiResponse<{ events: ShopEvent[]; total: number }>>('/api/events', { params }),
   
+  createEvent: (data: Partial<ShopEvent>) => api.post<ApiResponse<ShopEvent>>('/api/events', data),
+  
   getEvent: (eventId: number) => api.get<ApiResponse<ShopEvent>>(`/api/events/${eventId}`),
+  
+  updateEvent: (eventId: number, data: Partial<ShopEvent>) =>
+    api.put<ApiResponse<ShopEvent>>(`/api/events/${eventId}`, data),
+    
+  deleteEvent: (eventId: number) => api.delete<ApiResponse<any>>(`/api/events/${eventId}`),
   
   rsvpToEvent: (eventId: number, status: 'going' | 'maybe' | 'not_going') =>
     api.post<ApiResponse<any>>(`/api/events/${eventId}/rsvp`, { status }),

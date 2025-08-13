@@ -14,6 +14,7 @@ import ShopDetailScreen from '../screens/ShopDetailScreen'
 import ProfileScreen from '../screens/ProfileScreen'
 import MapScreen from '../screens/MapScreen'
 import SearchScreen from '../screens/SearchScreen'
+import EventManagementScreen from '../screens/EventManagementScreen'
 import LoginScreen from '../screens/auth/LoginScreen'
 import RegisterScreen from '../screens/auth/RegisterScreen'
 import AddSpotScreen from '../screens/AddSpotScreen'
@@ -36,6 +37,7 @@ export type RootStackParamList = {
   AddSpot: undefined
   AddShop: undefined
   EditProfile: undefined
+  EventManagement: undefined
 }
 
 export type TabParamList = {
@@ -181,6 +183,13 @@ const AppNavigator = () => {
               title: 'Add Shop',
               headerStyle: { backgroundColor: '#22c55e' },
               headerTintColor: 'white',
+            }}
+          />
+          <Stack.Screen 
+            name="EventManagement" 
+            component={EventManagementScreen}
+            options={{
+              headerShown: false,
             }}
           />
         </Stack.Navigator>

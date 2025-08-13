@@ -9,6 +9,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Linking,
+  Alert,
 } from 'react-native'
 import { useQuery } from '@tanstack/react-query'
 import { Ionicons } from '@expo/vector-icons'
@@ -148,9 +149,22 @@ const ShopsScreen = () => {
           )}
         </View>
         
-        <TouchableOpacity style={styles.favoriteButton}>
-          <Ionicons name="heart-outline" size={20} color="#ef4444" />
-        </TouchableOpacity>
+        <View style={styles.cardFooterActions}>
+          <TouchableOpacity
+            style={styles.eventsButton}
+            onPress={() => {
+              // Navigate to shop events - for now show alert
+              Alert.alert('Shop Events', `View events for ${shop.name}`)
+            }}
+          >
+            <Ionicons name="calendar" size={16} color="#22c55e" />
+            <Text style={styles.eventsButtonText}>Events</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.favoriteButton}>
+            <Ionicons name="heart-outline" size={20} color="#ef4444" />
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableOpacity>
   )
@@ -467,6 +481,25 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   actionButtonText: {
+    fontSize: 12,
+    color: '#22c55e',
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  cardFooterActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  eventsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0fdf4',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  eventsButtonText: {
     fontSize: 12,
     color: '#22c55e',
     fontWeight: '600',

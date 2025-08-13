@@ -1,8 +1,11 @@
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import { Ionicons } from '@expo/vector-icons'
 import { useAuthStore } from '../stores/authStore'
 
 const ProfileScreen = () => {
+  const navigation = useNavigation()
   const { user, isGuest, logout } = useAuthStore()
 
   if (isGuest) {
@@ -26,9 +29,19 @@ const ProfileScreen = () => {
       <Text style={styles.title}>Profile</Text>
       <Text style={styles.subtitle}>Welcome, {user?.username}!</Text>
       
-      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
+      <View style={styles.profileActions}>
+        <TouchableOpacity
+          style={styles.eventsButton}
+          onPress={() => navigation.navigate('EventManagement' as never)}
+        >
+          <Ionicons name="calendar" size={20} color="#22c55e" />
+          <Text style={styles.eventsButtonText}>Manage Events</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
@@ -79,6 +92,26 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  profileActions: {
+    gap: 16,
+  },
+  eventsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f0fdf4',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#22c55e',
+  },
+  eventsButtonText: {
+    color: '#22c55e',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginLeft: 8,
   },
 })
 
