@@ -13,6 +13,7 @@ import ShopsScreen from '../screens/ShopsScreen'
 import ShopDetailScreen from '../screens/ShopDetailScreen'
 import ProfileScreen from '../screens/ProfileScreen'
 import MapScreen from '../screens/MapScreen'
+import SearchScreen from '../screens/SearchScreen'
 import LoginScreen from '../screens/auth/LoginScreen'
 import RegisterScreen from '../screens/auth/RegisterScreen'
 import AddSpotScreen from '../screens/AddSpotScreen'
@@ -39,6 +40,7 @@ export type RootStackParamList = {
 
 export type TabParamList = {
   Discover: undefined
+  Search: undefined
   Spots: undefined
   Shops: undefined
   Map: undefined
@@ -56,6 +58,8 @@ const TabNavigator = () => {
           let iconName: keyof typeof Ionicons.glyphMap
 
           if (route.name === 'Discover') {
+            iconName = focused ? 'home' : 'home-outline'
+          } else if (route.name === 'Search') {
             iconName = focused ? 'search' : 'search-outline'
           } else if (route.name === 'Spots') {
             iconName = focused ? 'location' : 'location-outline'
@@ -90,6 +94,7 @@ const TabNavigator = () => {
       })}
     >
       <Tab.Screen name="Discover" component={DiscoverScreen} />
+      <Tab.Screen name="Search" component={SearchScreen} />
       <Tab.Screen name="Spots" component={SpotsScreen} />
       <Tab.Screen name="Shops" component={ShopsScreen} />
       <Tab.Screen name="Map" component={MapScreen} />
@@ -126,7 +131,7 @@ const AuthNavigator = () => {
 }
 
 const AppNavigator = () => {
-  const { isAuthenticated, isLoading } = useAuthStore()
+  const { isAuthenticated, isGuest, isLoading } = useAuthStore()
 
   // Show loading screen while checking authentication
   if (isLoading) {
@@ -135,55 +140,53 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isAuthenticated ? (
-          <>
-            <Stack.Screen name="MainTabs" component={TabNavigator} />
-            <Stack.Screen 
-              name="SpotDetail" 
-              component={SpotDetailScreen}
-              options={{
-                headerShown: true,
-                title: 'Spot Details',
-                headerStyle: { backgroundColor: '#22c55e' },
-                headerTintColor: 'white',
-              }}
-            />
-            <Stack.Screen 
-              name="ShopDetail" 
-              component={ShopDetailScreen}
-              options={{
-                headerShown: true,
-                title: 'Shop Details',
-                headerStyle: { backgroundColor: '#22c55e' },
-                headerTintColor: 'white',
-              }}
-            />
-            <Stack.Screen 
-              name="AddSpot" 
-              component={AddSpotScreen}
-              options={{
-                headerShown: true,
-                title: 'Add Spot',
-                headerStyle: { backgroundColor: '#22c55e' },
-                headerTintColor: 'white',
-              }}
-            />
-            <Stack.Screen 
-              name="AddShop" 
-              component={AddShopScreen}
-              options={{
-                headerShown: true,
-                title: 'Add Shop',
-                headerStyle: { backgroundColor: '#22c55e' },
-                headerTintColor: 'white',
-              }}
-            />
-          </>
-        ) : (
-          <Stack.Screen name="Auth" component={AuthNavigator} />
-        )}
-      </Stack.Navigator>
+      {(isAuthenticated || isGuest) ? (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="MainTabs" component={TabNavigator} />
+          <Stack.Screen 
+            name="SpotDetail" 
+            component={SpotDetailScreen}
+            options={{
+              headerShown: true,
+              title: 'Spot Details',
+              headerStyle: { backgroundColor: '#22c55e' },
+              headerTintColor: 'white',
+            }}
+          />
+          <Stack.Screen 
+            name="ShopDetail" 
+            component={ShopDetailScreen}
+            options={{
+              headerShown: true,
+              title: 'Shop Details',
+              headerStyle: { backgroundColor: '#22c55e' },
+              headerTintColor: 'white',
+            }}
+          />
+          <Stack.Screen 
+            name="AddSpot" 
+            component={AddSpotScreen}
+            options={{
+              headerShown: true,
+              title: 'Add Spot',
+              headerStyle: { backgroundColor: '#22c55e' },
+              headerTintColor: 'white',
+            }}
+          />
+          <Stack.Screen 
+            name="AddShop" 
+            component={AddShopScreen}
+            options={{
+              headerShown: true,
+              title: 'Add Shop',
+              headerStyle: { backgroundColor: '#22c55e' },
+              headerTintColor: 'white',
+            }}
+          />
+        </Stack.Navigator>
+      ) : (
+        <AuthNavigator />
+      )}
     </NavigationContainer>
   )
 }

@@ -7,6 +7,7 @@ interface AuthState {
   user: User | null
   token: string | null
   isAuthenticated: boolean
+  isGuest: boolean
   isLoading: boolean
   error: string | null
   
@@ -14,6 +15,7 @@ interface AuthState {
   login: (username: string, password: string) => Promise<boolean>
   register: (username: string, password: string, email?: string) => Promise<boolean>
   logout: () => Promise<void>
+  continueAsGuest: () => void
   loadStoredAuth: () => Promise<void>
   clearError: () => void
   updateUser: (user: Partial<User>) => void
@@ -23,6 +25,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   token: null,
   isAuthenticated: false,
+  isGuest: false,
   isLoading: false,
   error: null,
 
@@ -93,12 +96,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: async () => {
     try {
       // Clear stored credentials
-      await AsyncStorage.multiRemove(['auth_token', 'user_data'])
+      await AsyncStorage.multiRemove(['auth_token', 'user_data', 'is_guest'])
       
       set({
         user: null,
         token: null,
         isAuthenticated: false,
+        isGuest: false,
         error: null
       })
     } catch (error) {
@@ -106,31 +110,57 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
+  continueAsGuest: () => {
+    AsyncStorage.setItem('is_guest', 'true')
+    set({
+      user: null,
+      token: null,
+      isAuthenticated: false,
+      isGuest: true,
+      error: null,
+      isLoading: false
+    })
+  },
+
   loadStoredAuth: async () => {
     set({ isLoading: true })
     
     try {
-      const [token, userData] = await AsyncStorage.multiGet(['auth_token', 'user_data'])
+      const [token, userData, isGuest] = await AsyncStorage.multiGet(['auth_token', 'user_data', 'is_guest'])
+      
+      // Check if user was in guest mode
+      if (isGuest[1] === 'true') {
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          isGuest: true,
+          isLoading: false
+        })
+        return
+      }
       
       if (token[1] && userData[1]) {
         const user = JSON.parse(userData[1])
         
-        // Verify token is still valid
+        // Verify token is still valid - but don't fail if API is unreachable
         try {
           await authApi.getMe()
           set({
             user,
             token: token[1],
             isAuthenticated: true,
+            isGuest: false,
             isLoading: false
           })
         } catch {
-          // Token is invalid, clear storage
+          // Token is invalid, clear storage and continue as guest
           await AsyncStorage.multiRemove(['auth_token', 'user_data'])
           set({
             user: null,
             token: null,
             isAuthenticated: false,
+            isGuest: false,
             isLoading: false
           })
         }
@@ -139,6 +169,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           user: null,
           token: null,
           isAuthenticated: false,
+          isGuest: false,
           isLoading: false
         })
       }
@@ -148,6 +179,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: null,
         token: null,
         isAuthenticated: false,
+        isGuest: false,
         isLoading: false
       })
     }

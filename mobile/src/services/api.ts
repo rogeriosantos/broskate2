@@ -4,11 +4,20 @@ import { ApiResponse, User, Spot, Shop, ShopEvent } from '../types'
 
 // Use your local development server IP or production URL
 const API_BASE_URL = __DEV__ 
-  ? 'http://192.168.1.100:8000' // Replace with your local machine IP
+  ? 'http://10.10.42.177:8000' // Your machine's IP for React Native development
   : 'https://your-production-api.com'
 
 // Create axios instance
 export const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 10000,
+})
+
+// Create a second instance for guest/public endpoints
+export const publicApi = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',

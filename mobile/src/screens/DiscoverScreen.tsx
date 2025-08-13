@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Ionicons } from '@expo/vector-icons'
 import { spotsApi, shopsApi, eventsApi, handleApiError } from '../services/api'
 import { useLocationStore } from '../stores/locationStore'
+import { useAuthStore } from '../stores/authStore'
 import { Spot, Shop, ShopEvent } from '../types'
 
 const DiscoverScreen = () => {
@@ -75,8 +76,9 @@ const DiscoverScreen = () => {
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      // Navigate to search results screen
-      Alert.alert('Search', `Searching for: ${searchQuery}`)
+      // Navigate to Search tab with the query
+      // navigation.navigate('Search', { query: searchQuery })
+      Alert.alert('Search', `Use the Search tab for: ${searchQuery}`)
     }
   }
 

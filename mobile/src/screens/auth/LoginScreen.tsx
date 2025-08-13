@@ -16,7 +16,7 @@ import { useAuthStore } from '../../stores/authStore'
 
 const LoginScreen = () => {
   const navigation = useNavigation()
-  const { login, isLoading, error, clearError } = useAuthStore()
+  const { login, continueAsGuest, isLoading, error, clearError } = useAuthStore()
   
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -114,7 +114,10 @@ const LoginScreen = () => {
         </View>
 
         {/* Guest Browse */}
-        <TouchableOpacity style={styles.guestButton}>
+        <TouchableOpacity 
+          style={styles.guestButton}
+          onPress={continueAsGuest}
+        >
           <Text style={styles.guestButtonText}>Continue as Guest</Text>
         </TouchableOpacity>
       </View>

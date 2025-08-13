@@ -3,7 +3,23 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { useAuthStore } from '../stores/authStore'
 
 const ProfileScreen = () => {
-  const { user, logout } = useAuthStore()
+  const { user, isGuest, logout } = useAuthStore()
+
+  if (isGuest) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Profile</Text>
+        <Text style={styles.subtitle}>You're browsing as a guest</Text>
+        <Text style={styles.guestInfo}>
+          Sign up to save spots, connect with skaters, and unlock all features!
+        </Text>
+        
+        <TouchableOpacity style={styles.signUpButton} onPress={logout}>
+          <Text style={styles.signUpButtonText}>Sign Up / Log In</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
   return (
     <View style={styles.container}>
@@ -44,6 +60,25 @@ const styles = StyleSheet.create({
   logoutText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  guestInfo: {
+    fontSize: 14,
+    color: '#64748b',
+    textAlign: 'center',
+    marginHorizontal: 32,
+    marginBottom: 32,
+    lineHeight: 20,
+  },
+  signUpButton: {
+    backgroundColor: '#22c55e',
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 8,
+  },
+  signUpButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 })
 
