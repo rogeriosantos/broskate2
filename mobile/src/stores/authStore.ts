@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { User } from '../types'
 import { authApi, handleApiError } from '../services/api'
+import { useNotificationStore } from './notificationStore'
 
 interface AuthState {
   user: User | null
@@ -30,32 +31,96 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   error: null,
 
   login: async (username: string, password: string) => {
+    console.log('🔐 Attempting login for:', username)
     set({ isLoading: true, error: null })
     
     try {
+      console.log('📡 Making login API call...')
       const response = await authApi.login({ username, password })
-      const { user, token } = response.data.data
+      console.log('✅ Login response received')
+      
+      // Handle both response formats - new format with data.user/token or old format with access_token
+      let user, token
+      
+      if (response.data.data && response.data.data.user && response.data.data.token) {
+        // New format: { data: { user: {...}, token: "..." } }
+        user = response.data.data.user
+        token = response.data.data.token
+        console.log('📱 Using new response format')
+      } else if (response.data.access_token) {
+        // Old format: { access_token: "...", token_type: "bearer" }
+        token = response.data.access_token
+        console.log('📱 Using old response format, fetching user data...')
+        
+        // Store token temporarily for getMe call
+        await AsyncStorage.setItem('auth_token', token)
+        
+        // Fetch user data separately
+        try {
+          const userResponse = await authApi.getMe()
+          user = userResponse.data.data || userResponse.data
+          console.log('👤 Fetched user data successfully')
+        } catch (userError) {
+          console.error('❌ Failed to fetch user data:', userError)
+          console.error('❌ User fetch error details:', userError.response?.data)
+          set({
+            isLoading: false,
+            error: 'Failed to fetch user information',
+            isAuthenticated: false,
+            isGuest: false
+          })
+          return false
+        }
+      } else {
+        console.error('❌ Invalid login response format:', response.data)
+        set({
+          isLoading: false,
+          error: 'Invalid server response',
+          isAuthenticated: false,
+          isGuest: false
+        })
+        return false
+      }
       
       // Store credentials
+      console.log('💾 Storing auth data...')
       await AsyncStorage.multiSet([
         ['auth_token', token],
         ['user_data', JSON.stringify(user)]
       ])
       
+      console.log('✅ Setting authenticated state...')
       set({
         user,
         token,
         isAuthenticated: true,
+        isGuest: false,
         isLoading: false,
         error: null
       })
       
+      // Connect to WebSocket for real-time notifications
+      try {
+        console.log('🔌 Connecting to WebSocket...')
+        await useNotificationStore.getState().connect(user.id, token)
+      } catch (wsError) {
+        console.error('❌ WebSocket connection failed:', wsError)
+        // Don't fail login if WebSocket fails
+      }
+      
+      console.log('✅ Login successful!')
       return true
     } catch (error: any) {
+      console.error('❌ Login error:', error)
+      console.error('❌ Error response:', error.response?.data)
+      console.error('❌ Error status:', error.response?.status)
+      
       const errorMessage = handleApiError(error)
       set({
         isLoading: false,
-        error: errorMessage
+        error: errorMessage,
+        isAuthenticated: false,
+        isGuest: false
       })
       return false
     }
@@ -95,6 +160,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: async () => {
     try {
+      // Disconnect from WebSocket
+      useNotificationStore.getState().disconnect()
+      
       // Clear stored credentials
       await AsyncStorage.multiRemove(['auth_token', 'user_data', 'is_guest'])
       
@@ -123,13 +191,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   loadStoredAuth: async () => {
+    console.log('🔄 Loading stored auth...')
     set({ isLoading: true })
     
     try {
       const [token, userData, isGuest] = await AsyncStorage.multiGet(['auth_token', 'user_data', 'is_guest'])
+      console.log('📱 Stored auth data:', { 
+        hasToken: !!token[1], 
+        hasUser: !!userData[1], 
+        isGuest: isGuest[1] 
+      })
       
       // Check if user was in guest mode
       if (isGuest[1] === 'true') {
+        console.log('👤 User was in guest mode')
         set({
           user: null,
           token: null,
@@ -142,10 +217,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       
       if (token[1] && userData[1]) {
         const user = JSON.parse(userData[1])
+        console.log('👤 Found stored user:', user.username)
         
         // Verify token is still valid - but don't fail if API is unreachable
         try {
+          console.log('🔍 Validating token...')
           await authApi.getMe()
+          console.log('✅ Token is valid')
           set({
             user,
             token: token[1],
@@ -153,7 +231,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             isGuest: false,
             isLoading: false
           })
-        } catch {
+        } catch (error) {
+          console.log('❌ Token validation failed:', error.message)
           // Token is invalid, clear storage and continue as guest
           await AsyncStorage.multiRemove(['auth_token', 'user_data'])
           set({
@@ -165,6 +244,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           })
         }
       } else {
+        console.log('📱 No stored auth found')
         set({
           user: null,
           token: null,
@@ -174,7 +254,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         })
       }
     } catch (error) {
-      console.log('Error loading stored auth:', error)
+      console.error('❌ Error loading stored auth:', error)
       set({
         user: null,
         token: null,

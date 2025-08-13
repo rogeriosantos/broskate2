@@ -2,6 +2,7 @@ import React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createStackNavigator } from '@react-navigation/stack'
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
 import { useAuthStore } from '../stores/authStore'
 import { Ionicons } from '@expo/vector-icons'
 
@@ -15,6 +16,8 @@ import ProfileScreen from '../screens/ProfileScreen'
 import MapScreen from '../screens/MapScreen'
 import SearchScreen from '../screens/SearchScreen'
 import EventManagementScreen from '../screens/EventManagementScreen'
+import EditProfileScreen from '../screens/EditProfileScreen'
+import NotificationsScreen from '../screens/NotificationsScreen'
 import LoginScreen from '../screens/auth/LoginScreen'
 import RegisterScreen from '../screens/auth/RegisterScreen'
 import AddSpotScreen from '../screens/AddSpotScreen'
@@ -46,6 +49,7 @@ export type TabParamList = {
   Spots: undefined
   Shops: undefined
   Map: undefined
+  Notifications: undefined
   Profile: undefined
 }
 
@@ -69,6 +73,8 @@ const TabNavigator = () => {
             iconName = focused ? 'storefront' : 'storefront-outline'
           } else if (route.name === 'Map') {
             iconName = focused ? 'map' : 'map-outline'
+          } else if (route.name === 'Notifications') {
+            iconName = focused ? 'notifications' : 'notifications-outline'
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline'
           } else {
@@ -100,6 +106,7 @@ const TabNavigator = () => {
       <Tab.Screen name="Spots" component={SpotsScreen} />
       <Tab.Screen name="Shops" component={ShopsScreen} />
       <Tab.Screen name="Map" component={MapScreen} />
+      <Tab.Screen name="Notifications" component={NotificationsScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   )
@@ -132,12 +139,25 @@ const AuthNavigator = () => {
   )
 }
 
+const LoadingScreen = () => {
+  return (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#22c55e" />
+      <Text style={styles.loadingText}>Loading...</Text>
+    </View>
+  )
+}
+
 const AppNavigator = () => {
   const { isAuthenticated, isGuest, isLoading } = useAuthStore()
 
   // Show loading screen while checking authentication
   if (isLoading) {
-    return null // Could return a loading component here
+    return (
+      <NavigationContainer>
+        <LoadingScreen />
+      </NavigationContainer>
+    )
   }
 
   return (
@@ -192,6 +212,13 @@ const AppNavigator = () => {
               headerShown: false,
             }}
           />
+          <Stack.Screen 
+            name="EditProfile" 
+            component={EditProfileScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
         </Stack.Navigator>
       ) : (
         <AuthNavigator />
@@ -199,5 +226,19 @@ const AppNavigator = () => {
     </NavigationContainer>
   )
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#64748b',
+  },
+})
 
 export default AppNavigator

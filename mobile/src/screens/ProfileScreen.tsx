@@ -31,6 +31,14 @@ const ProfileScreen = () => {
       
       <View style={styles.profileActions}>
         <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => navigation.navigate('EditProfile' as never)}
+        >
+          <Ionicons name="person-outline" size={20} color="#3b82f6" />
+          <Text style={styles.editButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
           style={styles.eventsButton}
           onPress={() => navigation.navigate('EventManagement' as never)}
         >
@@ -95,6 +103,23 @@ const styles = StyleSheet.create({
   },
   profileActions: {
     gap: 16,
+  },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#eff6ff',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#3b82f6',
+  },
+  editButtonText: {
+    color: '#3b82f6',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginLeft: 8,
   },
   eventsButton: {
     flexDirection: 'row',

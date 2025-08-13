@@ -54,17 +54,28 @@ export default function LoginPage() {
         password: formData.password
       })
       
-      const { access_token } = response.data
-      
-      // Temporarily set token for getMe request
-      useAuthStore.getState().setToken(access_token)
-      
-      // Get user info
-      const userResponse = await authApi.getMe()
-      const user = userResponse.data
+      // Handle both response formats
+      let user, token
+      if (response.data.data && response.data.data.user && response.data.data.token) {
+        // New format: { data: { user: {...}, token: "..." } }
+        user = response.data.data.user
+        token = response.data.data.token
+      } else if (response.data.access_token) {
+        // Old format: { access_token: "...", token_type: "bearer" }
+        token = response.data.access_token
+        
+        // Temporarily set token for getMe request
+        useAuthStore.getState().setToken(token)
+        
+        // Get user info
+        const userResponse = await authApi.getMe()
+        user = userResponse.data
+      } else {
+        throw new Error('Invalid login response format')
+      }
       
       // Update auth store with complete data
-      login(user, access_token)
+      login(user, token)
       
       toast.success('Welcome back!')
       router.push('/')

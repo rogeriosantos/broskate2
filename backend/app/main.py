@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from app.database.connection import init_db, close_db
-from app.routes import auth, users, shops, spots, debug
+from app.routes import auth, users, shops, spots, debug, media, websocket
 from app.middleware.error_handler import add_exception_handlers
 from app.middleware.logging import add_logging_middleware
 
@@ -30,7 +30,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "https://*.vercel.app"],
+    allow_origins=["*"],  # Allow all origins for development
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,6 +45,8 @@ app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
 app.include_router(users.router, prefix="/api/users", tags=["users"])
 app.include_router(shops.router, prefix="/api/shops", tags=["shops"])
 app.include_router(spots.router, prefix="/api/spots", tags=["spots"])
+app.include_router(media.router, prefix="/api/media", tags=["media"])
+app.include_router(websocket.router, prefix="/api/ws", tags=["websocket"])
 app.include_router(debug.router, prefix="/api/debug", tags=["debug"])
 
 

@@ -3,8 +3,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ApiResponse, User, Spot, Shop, ShopEvent } from '../types'
 
 // Use your local development server IP or production URL
+// For iOS Simulator, use localhost. For physical device, use network IP
 const API_BASE_URL = __DEV__ 
-  ? 'http://10.10.42.177:8000' // Your machine's IP for React Native development
+  ? 'http://localhost:8000' // Use localhost for iOS simulator
   : 'https://your-production-api.com'
 
 // Create axios instance
@@ -32,9 +33,12 @@ api.interceptors.request.use(
       const token = await AsyncStorage.getItem('auth_token')
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
+        console.log('🔑 Added authorization header for:', config.url)
+      } else {
+        console.log('📱 No token found for:', config.url)
       }
     } catch (error) {
-      console.log('Error getting auth token:', error)
+      console.log('❌ Error getting auth token:', error)
     }
     return config
   },

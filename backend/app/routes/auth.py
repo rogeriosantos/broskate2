@@ -78,9 +78,9 @@ async def register(user: UserCreate):
         )
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login(user_credentials: LoginRequest):
-    """Login user and return JWT token"""
+    """Login user and return JWT token with user info"""
     user = await authenticate_user(user_credentials.username, user_credentials.password)
     if not user:
         raise HTTPException(
@@ -94,7 +94,13 @@ async def login(user_credentials: LoginRequest):
         data={"sub": user['username']}, expires_delta=access_token_expires
     )
     
-    return Token(access_token=access_token, token_type="bearer")
+    # Return both user and token for mobile app compatibility (updated format)
+    return {
+        "data": {
+            "user": UserResponse(**dict(user)).dict(),
+            "token": access_token
+        }
+    }
 
 
 @router.get("/me", response_model=UserResponse)

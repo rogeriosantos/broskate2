@@ -111,3 +111,20 @@ async def optional_auth(credentials: Optional[HTTPAuthorizationCredentials] = De
         return await get_current_user(credentials)
     except HTTPException:
         return None
+
+
+async def get_current_user_ws(token: str):
+    """Get current user from JWT token for WebSocket connections"""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise JWTError("Invalid token payload")
+        
+        user = await get_user_by_username(username)
+        if user is None:
+            raise JWTError("User not found")
+            
+        return user
+    except JWTError as e:
+        raise Exception(f"WebSocket authentication failed: {str(e)}")
