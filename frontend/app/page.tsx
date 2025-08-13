@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { MapPinIcon, BuildingStorefrontIcon, UserGroupIcon, SparklesIcon, FireIcon, RocketLaunchIcon } from '@heroicons/react/24/outline'
-import { useGuestAnalytics } from '@/lib/hooks/useGuestAnalytics'
+import { useGuestAnalytics } from '../lib/hooks/useGuestAnalytics'
 
 export default function HomePage() {
   const { trackPageView, trackSignupPromptClick } = useGuestAnalytics()
