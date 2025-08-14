@@ -11,7 +11,7 @@ from app.database.connection import execute_query, execute_single_query, execute
 router = APIRouter()
 
 
-@router.get("/", response_model=List[SpotResponse])
+@router.get("", response_model=List[SpotResponse])
 async def get_spots(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
@@ -100,7 +100,7 @@ async def get_spots(
         return []
 
 
-@router.post("/", response_model=SpotResponse)
+@router.post("", response_model=SpotResponse)
 async def create_spot(
     spot: SpotCreate,
     current_user = Depends(get_current_active_user)
