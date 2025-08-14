@@ -11,7 +11,7 @@ from app.database.connection import execute_query, execute_single_query, execute
 router = APIRouter()
 
 
-@router.get("/", response_model=List[ShopResponse])
+@router.get("", response_model=List[ShopResponse])
 async def get_shops(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
@@ -59,7 +59,7 @@ async def get_shops(
         return []
 
 
-@router.post("/", response_model=ShopResponse)
+@router.post("", response_model=ShopResponse)
 async def create_shop(
     shop: ShopCreate,
     current_user = Depends(get_current_active_user)
