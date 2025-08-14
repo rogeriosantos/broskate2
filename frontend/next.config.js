@@ -1,12 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      'localhost',
-      'res.cloudinary.com', 
-      'images.unsplash.com', 
-      'via.placeholder.com'
-    ],
+    domains: ['localhost', 'res.cloudinary.com', 'images.unsplash.com', 'via.placeholder.com'],
   },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://broskate2-production.up.railway.app',
@@ -20,6 +15,6 @@ const nextConfig = {
   },
   // Reduce memory pressure
   swcMinify: true,
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
