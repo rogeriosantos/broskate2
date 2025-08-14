@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost', 'res.cloudinary.com', 'images.unsplash.com', 'via.placeholder.com'],
+    domains: [
+      'localhost',
+      'res.cloudinary.com', 
+      'images.unsplash.com', 
+      'via.placeholder.com'
+    ],
   },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://broskate2-production.up.railway.app',
@@ -9,6 +14,12 @@ const nextConfig = {
       process.env.NEXT_PUBLIC_MAPBOX_TOKEN ||
       'pk.eyJ1Ijoicm9nZXJpb3NhbnRvcyIsImEiOiJjbWU0cGJrN3QwajNjMmpzODJhaGdldGtpIn0.N9l-8X_nrV62P5LR1Gjsxg',
   },
-};
+  // Help with file system operations on Windows
+  experimental: {
+    optimizePackageImports: ['@heroicons/react'],
+  },
+  // Reduce memory pressure
+  swcMinify: true,
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

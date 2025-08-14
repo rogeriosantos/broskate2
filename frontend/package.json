@@ -2,9 +2,15 @@
   "name": "broskate-frontend",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "rimraf .next && next build",
+    "build:vercel": "rimraf .next && cross-env NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "build:clean": "rimraf .next && npm run build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit"
@@ -37,8 +43,10 @@
     "@types/node": "^20.10.5",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
+    "cross-env": "^10.0.0",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.0.4",
+    "rimraf": "^6.0.1",
     "typescript": "^5.3.3"
   }
 }
