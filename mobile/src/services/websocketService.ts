@@ -1,158 +1,159 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface WebSocketMessage {
-  type: string
-  [key: string]: any
+  type: string;
+  [key: string]: any;
 }
 
-type NotificationHandler = (notification: any) => void
-type ConnectionHandler = (connected: boolean) => void
+type NotificationHandler = (notification: any) => void;
+type ConnectionHandler = (connected: boolean) => void;
 
 class WebSocketService {
-  private ws: WebSocket | null = null
-  private reconnectAttempts = 0
-  private maxReconnectAttempts = 5
-  private reconnectDelay = 1000 // Start with 1 second
-  private maxReconnectDelay = 30000 // Max 30 seconds
-  private pingInterval: NodeJS.Timeout | null = null
-  private reconnectTimeout: NodeJS.Timeout | null = null
-  
-  private notificationHandlers: NotificationHandler[] = []
-  private connectionHandlers: ConnectionHandler[] = []
-  private unreadCount = 0
-  
-  private baseUrl: string
-  private userId: number | null = null
-  private token: string | null = null
+  private ws: WebSocket | null = null;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+  private reconnectDelay = 1000; // Start with 1 second
+  private maxReconnectDelay = 30000; // Max 30 seconds
+  private pingInterval: NodeJS.Timeout | null = null;
+  private reconnectTimeout: NodeJS.Timeout | null = null;
+
+  private notificationHandlers: NotificationHandler[] = [];
+  private connectionHandlers: ConnectionHandler[] = [];
+  private unreadCount = 0;
+
+  private baseUrl: string;
+  private userId: number | null = null;
+  private token: string | null = null;
 
   constructor(baseUrl: string) {
     // Convert http to ws protocol
-    this.baseUrl = baseUrl.replace('http://', 'ws://').replace('https://', 'wss://')
+    this.baseUrl = baseUrl.replace('http://', 'ws://').replace('https://', 'wss://');
   }
 
   async connect(userId: number, token: string): Promise<void> {
-    this.userId = userId
-    this.token = token
-    
+    this.userId = userId;
+    this.token = token;
+
     if (this.ws?.readyState === WebSocket.OPEN) {
-      console.log('🔌 WebSocket already connected')
-      return
+      console.log('🔌 WebSocket already connected');
+      return;
     }
 
-    const wsUrl = `${this.baseUrl}/api/ws/ws/${userId}?token=${encodeURIComponent(token)}`
-    console.log('🔌 Connecting to WebSocket:', wsUrl)
+    const wsUrl = `${this.baseUrl}/api/ws/ws/${userId}?token=${encodeURIComponent(token)}`;
+    console.log('🔌 Connecting to WebSocket:', wsUrl);
 
     try {
-      this.ws = new WebSocket(wsUrl)
-      this.setupEventListeners()
+      this.ws = new WebSocket(wsUrl);
+      this.setupEventListeners();
     } catch (error) {
-      console.error('❌ WebSocket connection error:', error)
-      this.scheduleReconnect()
+      console.error('❌ WebSocket connection error:', error);
+      this.scheduleReconnect();
     }
   }
 
   private setupEventListeners() {
-    if (!this.ws) return
+    if (!this.ws) return;
 
     this.ws.onopen = () => {
-      console.log('✅ WebSocket connected successfully')
-      this.reconnectAttempts = 0
-      this.reconnectDelay = 1000
-      this.notifyConnectionHandlers(true)
-      this.startPingInterval()
-    }
+      console.log('✅ WebSocket connected successfully');
+      this.reconnectAttempts = 0;
+      this.reconnectDelay = 1000;
+      this.notifyConnectionHandlers(true);
+      this.startPingInterval();
+    };
 
     this.ws.onmessage = (event) => {
       try {
-        const message: WebSocketMessage = JSON.parse(event.data)
-        this.handleMessage(message)
+        const message: WebSocketMessage = JSON.parse(event.data);
+        this.handleMessage(message);
       } catch (error) {
-        console.error('❌ Failed to parse WebSocket message:', error)
+        console.error('❌ Failed to parse WebSocket message:', error);
       }
-    }
+    };
 
     this.ws.onclose = (event) => {
-      console.log(`🔌 WebSocket closed: ${event.code} - ${event.reason}`)
-      this.notifyConnectionHandlers(false)
-      this.stopPingInterval()
-      
-      if (event.code !== 1000) { // Not a normal closure
-        this.scheduleReconnect()
+      console.log(`🔌 WebSocket closed: ${event.code} - ${event.reason}`);
+      this.notifyConnectionHandlers(false);
+      this.stopPingInterval();
+
+      if (event.code !== 1000) {
+        // Not a normal closure
+        this.scheduleReconnect();
       }
-    }
+    };
 
     this.ws.onerror = (error) => {
-      console.error('❌ WebSocket error:', error)
-    }
+      console.error('❌ WebSocket error:', error);
+    };
   }
 
   private handleMessage(message: WebSocketMessage) {
-    console.log('📨 WebSocket message received:', message.type)
+    console.log('📨 WebSocket message received:', message.type);
 
     switch (message.type) {
       case 'connection_established':
-        console.log('🎉 Connection established:', message.message)
-        break
+        console.log('🎉 Connection established:', message.message);
+        break;
 
       case 'notification':
-        console.log('🔔 New notification:', message.title)
-        this.notifyNotificationHandlers(message)
-        break
+        console.log('🔔 New notification:', message.title);
+        this.notifyNotificationHandlers(message);
+        break;
 
       case 'unread_count':
       case 'unread_count_updated':
-        console.log('📊 Unread count updated:', message.count)
-        this.unreadCount = message.count
-        break
+        console.log('📊 Unread count updated:', message.count);
+        this.unreadCount = message.count;
+        break;
 
       case 'recent_notifications':
-        console.log('📜 Received recent notifications:', message.notifications?.length)
+        console.log('📜 Received recent notifications:', message.notifications?.length);
         if (message.notifications) {
           message.notifications.forEach((notif: any) => {
-            this.notifyNotificationHandlers(notif)
-          })
+            this.notifyNotificationHandlers(notif);
+          });
         }
-        break
+        break;
 
       case 'pong':
         // Pong response to ping
-        break
+        break;
 
       case 'subscription_confirmed':
-        console.log('✅ Subscribed to channel:', message.channel)
-        break
+        console.log('✅ Subscribed to channel:', message.channel);
+        break;
 
       case 'broadcast':
-        console.log('📢 Broadcast message:', message.data)
+        console.log('📢 Broadcast message:', message.data);
         this.notifyNotificationHandlers({
           type: 'broadcast',
           title: 'Broadcast',
           message: message.data?.message || 'Broadcast message',
-          data: message.data
-        })
-        break
+          data: message.data,
+        });
+        break;
 
       default:
-        console.log('🤷 Unknown message type:', message.type)
+        console.log('🤷 Unknown message type:', message.type);
     }
   }
 
   private scheduleReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.log('❌ Max reconnect attempts reached')
-      return
+      console.log('❌ Max reconnect attempts reached');
+      return;
     }
 
-    this.reconnectAttempts++
-    const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1), this.maxReconnectDelay)
-    
-    console.log(`🔄 Scheduling reconnect attempt ${this.reconnectAttempts} in ${delay}ms`)
-    
+    this.reconnectAttempts++;
+    const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1), this.maxReconnectDelay);
+
+    console.log(`🔄 Scheduling reconnect attempt ${this.reconnectAttempts} in ${delay}ms`);
+
     this.reconnectTimeout = setTimeout(() => {
       if (this.userId && this.token) {
-        this.connect(this.userId, this.token)
+        this.connect(this.userId, this.token);
       }
-    }, delay)
+    }, delay);
   }
 
   private startPingInterval() {
@@ -160,121 +161,121 @@ class WebSocketService {
       if (this.ws?.readyState === WebSocket.OPEN) {
         this.send({
           type: 'ping',
-          timestamp: Date.now()
-        })
+          timestamp: Date.now(),
+        });
       }
-    }, 30000) // Ping every 30 seconds
+    }, 30000); // Ping every 30 seconds
   }
 
   private stopPingInterval() {
     if (this.pingInterval) {
-      clearInterval(this.pingInterval)
-      this.pingInterval = null
+      clearInterval(this.pingInterval);
+      this.pingInterval = null;
     }
   }
 
   send(message: WebSocketMessage) {
     if (this.ws?.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify(message))
+      this.ws.send(JSON.stringify(message));
     } else {
-      console.warn('⚠️ WebSocket not connected, cannot send message')
+      console.warn('⚠️ WebSocket not connected, cannot send message');
     }
   }
 
   subscribeToChannel(channel: string) {
     this.send({
       type: 'subscribe',
-      channel
-    })
+      channel,
+    });
   }
 
   unsubscribeFromChannel(channel: string) {
     this.send({
       type: 'unsubscribe',
-      channel
-    })
+      channel,
+    });
   }
 
   markNotificationAsRead(notificationId: string) {
     this.send({
       type: 'mark_notification_read',
-      notification_id: notificationId
-    })
+      notification_id: notificationId,
+    });
   }
 
   requestUnreadCount() {
     this.send({
-      type: 'get_unread_count'
-    })
+      type: 'get_unread_count',
+    });
   }
 
   // Notification management
   onNotification(handler: NotificationHandler) {
-    this.notificationHandlers.push(handler)
+    this.notificationHandlers.push(handler);
     return () => {
-      this.notificationHandlers = this.notificationHandlers.filter(h => h !== handler)
-    }
+      this.notificationHandlers = this.notificationHandlers.filter((h) => h !== handler);
+    };
   }
 
   onConnectionChange(handler: ConnectionHandler) {
-    this.connectionHandlers.push(handler)
+    this.connectionHandlers.push(handler);
     return () => {
-      this.connectionHandlers = this.connectionHandlers.filter(h => h !== handler)
-    }
+      this.connectionHandlers = this.connectionHandlers.filter((h) => h !== handler);
+    };
   }
 
   private notifyNotificationHandlers(notification: any) {
-    this.notificationHandlers.forEach(handler => {
+    this.notificationHandlers.forEach((handler) => {
       try {
-        handler(notification)
+        handler(notification);
       } catch (error) {
-        console.error('❌ Error in notification handler:', error)
+        console.error('❌ Error in notification handler:', error);
       }
-    })
+    });
   }
 
   private notifyConnectionHandlers(connected: boolean) {
-    this.connectionHandlers.forEach(handler => {
+    this.connectionHandlers.forEach((handler) => {
       try {
-        handler(connected)
+        handler(connected);
       } catch (error) {
-        console.error('❌ Error in connection handler:', error)
+        console.error('❌ Error in connection handler:', error);
       }
-    })
+    });
   }
 
   getUnreadCount(): number {
-    return this.unreadCount
+    return this.unreadCount;
   }
 
   isConnected(): boolean {
-    return this.ws?.readyState === WebSocket.OPEN
+    return this.ws?.readyState === WebSocket.OPEN;
   }
 
   disconnect() {
-    console.log('🔌 Disconnecting WebSocket...')
-    
+    console.log('🔌 Disconnecting WebSocket...');
+
     if (this.reconnectTimeout) {
-      clearTimeout(this.reconnectTimeout)
-      this.reconnectTimeout = null
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
     }
-    
-    this.stopPingInterval()
-    
+
+    this.stopPingInterval();
+
     if (this.ws) {
-      this.ws.close(1000, 'Client disconnect')
-      this.ws = null
+      this.ws.close(1000, 'Client disconnect');
+      this.ws = null;
     }
-    
-    this.reconnectAttempts = 0
-    this.notifyConnectionHandlers(false)
+
+    this.reconnectAttempts = 0;
+    this.notifyConnectionHandlers(false);
   }
 }
 
 // Create singleton instance
-const API_BASE_URL = __DEV__ 
-  ? 'http://localhost:8000' // Use localhost for iOS simulator
-  : 'https://your-production-api.com'
+const API_BASE_URL = __DEV__
+  ? 'https://broskate2-production.up.railway.app' // Use localhost for iOS simulator
+  : 'https://broskate2-production.up.railway.app';
 
-export const websocketService = new WebSocketService(API_BASE_URL)
-export default websocketService
+export const websocketService = new WebSocketService(API_BASE_URL);
+export default websocketService;
