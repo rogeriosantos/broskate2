@@ -52,7 +52,8 @@ export default function ShopsPage() {
       shopsApi.getShops({
         page,
         limit: 12,
-        // Temporarily disable location filtering to test
+        // Only apply location filtering if user explicitly requests it
+        // For now, show all shops regardless of location
         // latitude: location?.lat,
         // longitude: location?.lng,
         // radius_km: location ? 50 : undefined,
@@ -62,14 +63,6 @@ export default function ShopsPage() {
 
   const shops = shopsData?.data || [];
   const totalPages = Math.ceil((shops.length || 0) / 12); // Since we don't have total from API, use array length
-
-  // Debug: Log the data being received
-  console.log('🔍 Shops Debug:', {
-    shopsData,
-    shops,
-    isLoading,
-    error
-  });
 
   if (isLoading) {
     return (
