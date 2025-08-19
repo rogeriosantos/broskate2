@@ -109,14 +109,20 @@ export const spotsApi = {
     difficulty_level?: number;
     approved_only?: boolean;
     search?: string;
-  }) => api.get<ApiResponse<{ spots: Spot[]; total: number }>>('/api/spots', { params }),
+  }) => api.get('/api/spots', { params }).then(res => {
+    console.log('🔍 Spots API response:', res.data);
+    return { data: { spots: Array.isArray(res.data) ? res.data : [], total: Array.isArray(res.data) ? res.data.length : 0 } };
+  }),
 
   createSpot: (data: Partial<Spot>) => api.post<ApiResponse<Spot>>('/api/spots', data),
 
   getSpot: (spotId: number) => api.get<ApiResponse<Spot>>(`/api/spots/${spotId}`),
 
   getNearbySpots: (params: { latitude: number; longitude: number; radius_km?: number; limit?: number }) =>
-    api.get<ApiResponse<{ spots: Spot[]; total: number }>>('/api/spots/nearby', { params }),
+    api.get('/api/spots/nearby', { params }).then(res => {
+      console.log('🔍 Nearby Spots API response:', res.data);
+      return { data: { spots: Array.isArray(res.data) ? res.data : [], total: Array.isArray(res.data) ? res.data.length : 0 } };
+    }),
 
   checkinAtSpot: (spotId: number, data?: { notes?: string }) => api.post<ApiResponse<any>>(`/api/spots/${spotId}/checkin`, data),
 
@@ -146,7 +152,10 @@ export const shopsApi = {
     radius_km?: number;
     search?: string;
     owner_id?: number;
-  }) => api.get<ApiResponse<{ shops: Shop[]; total: number }>>('/api/shops', { params }),
+  }) => api.get('/api/shops', { params }).then(res => {
+    console.log('🔍 Shops API response:', res.data);
+    return { data: { shops: Array.isArray(res.data) ? res.data : [], total: Array.isArray(res.data) ? res.data.length : 0 } };
+  }),
 
   createShop: (data: Partial<Shop>) => api.post<ApiResponse<Shop>>('/api/shops', data),
 
@@ -177,7 +186,7 @@ export const eventsApi = {
     end_date?: string;
     organizer_id?: number;
     attending_user_id?: number;
-  }) => api.get<ApiResponse<{ events: ShopEvent[]; total: number }>>('/api/events', { params }),
+  }) => api.get('/api/events', { params }).then(res => ({ data: { events: res.data, total: res.data.length } })),
 
   createEvent: (data: Partial<ShopEvent>) => api.post<ApiResponse<ShopEvent>>('/api/events', data),
 

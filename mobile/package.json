@@ -37,7 +37,16 @@
     "react-native-maps": "^1.20.1",
     "react-native-web": "^0.20.0",
     "websocket": "^1.0.35",
-    "zustand": "^5.0.7"
+    "zustand": "^5.0.7",
+    "expo-task-manager": "~13.1.6",
+    "expo-media-library": "~17.1.7",
+    "expo-image-manipulator": "~13.1.7",
+    "expo-battery": "~9.1.4",
+    "expo-screen-orientation": "~8.1.7",
+    "expo-haptics": "~14.1.4",
+    "expo-secure-store": "~14.2.3",
+    "expo-application": "~6.1.5",
+    "expo-constants": "~17.1.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

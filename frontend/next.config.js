@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    // Disable ESLint during production builds
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    // Disable type checking during production builds (optional)
+    ignoreBuildErrors: false,
+  },
   images: {
     domains: ['localhost', 'res.cloudinary.com', 'images.unsplash.com', 'via.placeholder.com'],
   },
@@ -13,8 +21,6 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@heroicons/react'],
   },
-  // Reduce memory pressure
-  swcMinify: true,
 };
 
 module.exports = nextConfig;

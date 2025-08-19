@@ -39,7 +39,7 @@ const SpotsScreen = () => {
     }),
   })
 
-  const spots = spotsData?.data.data.spots || []
+  const spots = spotsData?.data?.data?.spots || []
 
   const filters = [
     { key: 'all', label: 'All Spots', icon: '🛹' },

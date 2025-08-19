@@ -82,8 +82,8 @@ const MapScreen = () => {
     enabled: !!region && (filterType === 'all' || filterType === 'shops'),
   })
 
-  const spots = spotsData?.data.data.spots || []
-  const shops = shopsData?.data.data.shops || []
+  const spots = spotsData?.data?.data?.spots || []
+  const shops = shopsData?.data?.data?.shops || []
 
   const filteredSpots = spots.filter(spot =>
     !searchQuery || spot.name.toLowerCase().includes(searchQuery.toLowerCase())

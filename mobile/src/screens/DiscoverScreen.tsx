@@ -188,9 +188,9 @@ const DiscoverScreen = () => {
           </TouchableOpacity>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {nearbySpots?.data.data.spots.map((spot) => (
+          {nearbySpots?.data?.data?.spots?.map((spot) => (
             <SpotCard key={spot.id} spot={spot} />
-          ))}
+          )) || <Text style={styles.emptyText}>No spots found nearby</Text>}
         </ScrollView>
       </View>
 
@@ -203,9 +203,9 @@ const DiscoverScreen = () => {
           </TouchableOpacity>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {nearbyShops?.data.data.shops.map((shop) => (
+          {nearbyShops?.data?.data?.shops?.map((shop) => (
             <ShopCard key={shop.id} shop={shop} />
-          ))}
+          )) || <Text style={styles.emptyText}>No shops found nearby</Text>}
         </ScrollView>
       </View>
 
@@ -218,9 +218,9 @@ const DiscoverScreen = () => {
           </TouchableOpacity>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {upcomingEvents?.data.data.events.map((event) => (
+          {upcomingEvents?.data?.data?.events?.map((event) => (
             <EventCard key={event.id} event={event} />
-          ))}
+          )) || <Text style={styles.emptyText}>No upcoming events</Text>}
         </ScrollView>
       </View>
     </ScrollView>
@@ -361,6 +361,13 @@ const styles = StyleSheet.create({
     color: '#f97316',
     fontWeight: '600',
     marginBottom: 4,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#64748b',
+    textAlign: 'center',
+    padding: 20,
+    fontStyle: 'italic',
   },
 })
 

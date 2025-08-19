@@ -49,8 +49,8 @@ const ShopsScreen = () => {
     }),
   })
 
-  const shops = shopsData?.data.data.shops || []
-  const events = eventsData?.data.data.events || []
+  const shops = shopsData?.data?.data?.shops || []
+  const events = eventsData?.data?.data?.events || []
 
   const handleRefresh = async () => {
     setRefreshing(true)

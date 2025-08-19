@@ -86,7 +86,7 @@ class DeviceService {
       
       this.deviceInfo = {
         // Device basic info
-        deviceId: Application.getAndroidId(),
+        deviceId: Platform.OS === 'android' ? Application.getAndroidId() : null,
         deviceName: Device.deviceName,
         modelName: Device.modelName,
         deviceType: Device.deviceType,
