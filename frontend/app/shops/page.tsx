@@ -52,15 +52,24 @@ export default function ShopsPage() {
       shopsApi.getShops({
         page,
         limit: 12,
-        latitude: location?.lat,
-        longitude: location?.lng,
-        radius_km: location ? 50 : undefined,
+        // Temporarily disable location filtering to test
+        // latitude: location?.lat,
+        // longitude: location?.lng,
+        // radius_km: location ? 50 : undefined,
       }),
     retry: 2,
   });
 
-  const shops = shopsData?.data?.shops || [];
-  const totalPages = Math.ceil((shopsData?.data?.total || 0) / 12);
+  const shops = shopsData?.data || [];
+  const totalPages = Math.ceil((shops.length || 0) / 12); // Since we don't have total from API, use array length
+
+  // Debug: Log the data being received
+  console.log('🔍 Shops Debug:', {
+    shopsData,
+    shops,
+    isLoading,
+    error
+  });
 
   if (isLoading) {
     return (

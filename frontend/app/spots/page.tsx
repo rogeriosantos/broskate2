@@ -70,13 +70,13 @@ export default function SpotsPage() {
         radius_km: location ? 50 : undefined,
         spot_type: spotType || undefined,
         difficulty_level: difficultyLevel || undefined,
-        approved_only: true, // Only show approved spots for guests
+        approved_only: false, // Show all spots (including unapproved) for now
       }),
     retry: 2,
   });
 
-  const spots = spotsData?.data?.spots || [];
-  const totalPages = Math.ceil((spotsData?.data?.total || 0) / 12);
+  const spots = spotsData?.data || [];
+  const totalPages = Math.ceil((spots.length || 0) / 12); // Since we don't have total from API, use array length
 
   const getDifficultyColor = (level: number) => {
     const colors: { [key: number]: string } = {
