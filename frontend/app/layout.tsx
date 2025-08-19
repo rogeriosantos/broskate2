@@ -1,5 +1,5 @@
 import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Oswald } from 'next/font/google';
 import { Providers } from './providers';
 import { NavBar } from '../components/layout/NavBar';
@@ -21,7 +21,16 @@ export const metadata: Metadata = {
   description: 'Connect with local skate shops, discover spots, and build your skateboarding community',
   keywords: ['skateboarding', 'skate spots', 'skate shops', 'community', 'social network'],
   authors: [{ name: 'BroSkate Team' }],
-  viewport: 'width=device-width, initial-scale=1',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
   themeColor: '#0ea5e9',
 };
 
