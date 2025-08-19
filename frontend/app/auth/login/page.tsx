@@ -34,7 +34,7 @@ export default function LoginPage() {
     // Basic validation
     const newErrors: Record<string, string> = {};
     if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
+      newErrors.username = 'Username or email is required';
     }
     if (!formData.password) {
       newErrors.password = 'Password is required';
@@ -84,7 +84,7 @@ export default function LoginPage() {
       const errorMessage = handleApiError(error);
 
       if (error.response?.status === 401) {
-        setErrors({ general: 'Invalid username or password' });
+        setErrors({ general: 'Invalid username/email or password' });
       } else {
         setErrors({ general: errorMessage });
       }
@@ -122,20 +122,20 @@ export default function LoginPage() {
           <div className='space-y-4'>
             <div>
               <label htmlFor='username' className='block text-sm font-medium text-gray-700'>
-                Username
+                Username or Email
               </label>
               <input
                 id='username'
                 name='username'
                 type='text'
-                autoComplete='username'
+                autoComplete='username email'
                 required
                 value={formData.username}
                 onChange={handleChange}
                 className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
                   errors.username ? 'border-red-300' : 'border-gray-300'
                 } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm`}
-                placeholder='Enter your username'
+                placeholder='Enter your username or email'
               />
               {errors.username && <p className='mt-1 text-sm text-red-600'>{errors.username}</p>}
             </div>

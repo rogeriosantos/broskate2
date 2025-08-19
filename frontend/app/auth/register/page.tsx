@@ -47,6 +47,12 @@ export default function RegisterPage() {
       newErrors.username = 'Username must be at least 3 characters';
     }
 
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
@@ -55,10 +61,6 @@ export default function RegisterPage() {
 
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -72,10 +74,10 @@ export default function RegisterPage() {
     try {
       const registerData: any = {
         username: formData.username,
+        email: formData.email,
         password: formData.password,
       };
 
-      if (formData.email) registerData.email = formData.email;
       if (formData.bio) registerData.bio = formData.bio;
       if (formData.location) registerData.location = formData.location;
       if (formData.skill_level) registerData.skill_level = formData.skill_level;
@@ -163,13 +165,14 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor='email' className='block text-sm font-medium text-gray-700'>
-                Email (optional)
+                Email *
               </label>
               <input
                 id='email'
                 name='email'
                 type='email'
                 autoComplete='email'
+                required
                 value={formData.email}
                 onChange={handleChange}
                 className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${

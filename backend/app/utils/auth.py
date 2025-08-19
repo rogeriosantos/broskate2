@@ -52,6 +52,17 @@ async def get_user_by_username(username: str):
     return await execute_single_query(query, username)
 
 
+async def get_user_by_username_or_email(username_or_email: str):
+    """Get user from database by username or email"""
+    query = """
+    SELECT id, username, email, password_hash, profile_image_url, bio, 
+           location, skill_level, favorite_tricks, created_at, is_guest, is_active
+    FROM users 
+    WHERE (username = $1 OR email = $1) AND is_active = true
+    """
+    return await execute_single_query(query, username_or_email)
+
+
 async def get_user_by_id(user_id: int):
     """Get user from database by ID"""
     query = """
@@ -63,9 +74,9 @@ async def get_user_by_id(user_id: int):
     return await execute_single_query(query, user_id)
 
 
-async def authenticate_user(username: str, password: str):
-    """Authenticate user with username and password"""
-    user = await get_user_by_username(username)
+async def authenticate_user(username_or_email: str, password: str):
+    """Authenticate user with username/email and password"""
+    user = await get_user_by_username_or_email(username_or_email)
     if not user:
         return False
     if not verify_password(password, user['password_hash']):
