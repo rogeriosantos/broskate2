@@ -66,14 +66,101 @@ export default function MapSelector({
         center,
         zoom,
         styles: [
+          // Hide all points of interest except businesses
+          {
+            featureType: 'poi',
+            stylers: [{ visibility: 'off' }],
+          },
+          // Show business labels - ENABLED
           {
             featureType: 'poi.business',
+            stylers: [{ visibility: 'on' }],
+          },
+          // Hide government buildings
+          {
+            featureType: 'poi.government',
             stylers: [{ visibility: 'off' }],
+          },
+          // Hide medical facilities
+          {
+            featureType: 'poi.medical',
+            stylers: [{ visibility: 'off' }],
+          },
+          // Hide places of worship
+          {
+            featureType: 'poi.place_of_worship',
+            stylers: [{ visibility: 'off' }],
+          },
+          // Hide schools
+          {
+            featureType: 'poi.school',
+            stylers: [{ visibility: 'off' }],
+          },
+          // Hide sports complexes (but we'll keep parks)
+          {
+            featureType: 'poi.sports_complex',
+            stylers: [{ visibility: 'off' }],
+          },
+          // Keep parks but simplify them
+          {
+            featureType: 'poi.park',
+            elementType: 'labels.text',
+            stylers: [{ visibility: 'simplified' }],
+          },
+          // Hide transit stations
+          {
+            featureType: 'transit.station',
+            stylers: [{ visibility: 'off' }],
+          },
+          // Simplify road labels
+          {
+            featureType: 'road',
+            elementType: 'labels.text',
+            stylers: [{ visibility: 'simplified' }],
+          },
+          // Show local road labels - ENABLED
+          {
+            featureType: 'road.local',
+            elementType: 'labels.text',
+            stylers: [{ visibility: 'on' }],
+          },
+          // Keep main roads visible but simplified
+          {
+            featureType: 'road.arterial',
+            elementType: 'labels.text',
+            stylers: [{ visibility: 'simplified' }],
+          },
+          {
+            featureType: 'road.highway',
+            elementType: 'labels.text',
+            stylers: [{ visibility: 'simplified' }],
+          },
+          // Simplify administrative labels
+          {
+            featureType: 'administrative',
+            elementType: 'labels.text',
+            stylers: [{ visibility: 'simplified' }],
+          },
+          // Hide administrative boundaries except major ones
+          {
+            featureType: 'administrative.locality',
+            elementType: 'labels.text',
+            stylers: [{ visibility: 'on' }],
+          },
+          // Make water features more subtle
+          {
+            featureType: 'water',
+            elementType: 'labels.text',
+            stylers: [{ visibility: 'simplified' }],
           },
         ],
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
+        zoomControl: true,
+        zoomControlOptions: {
+          position: google.maps.ControlPosition.RIGHT_CENTER,
+        },
       });
 
       setMap(mapInstance);
