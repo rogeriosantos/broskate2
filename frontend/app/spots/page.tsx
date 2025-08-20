@@ -5,6 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { spotsApi, handleApiError } from '../../lib/api';
 import { useAuthStore } from '../../lib/stores/auth';
+import GoogleMap from '../../components/maps/GoogleMap';
+import MapToggle from '../../components/maps/MapToggle';
 
 interface Spot {
   id: number;
@@ -37,6 +39,8 @@ export default function SpotsPage() {
   const [spotType, setSpotType] = useState<string>('');
   const [difficultyLevel, setDifficultyLevel] = useState<number | ''>('');
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [view, setView] = useState<'list' | 'map'>('list');
+  const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
 
   // Get user location for nearby spots
   useEffect(() => {
@@ -82,6 +86,14 @@ export default function SpotsPage() {
   const uniqueSpots = spotsArray;
   const totalPages = Math.ceil((uniqueSpots.length || 0) / 12);
 
+  // Debug logging
+  console.log('Spots data:', {
+    spotsCount: uniqueSpots.length,
+    location,
+    view,
+    firstSpot: uniqueSpots[0]
+  });
+
   if (isLoading) {
     return (
       <div className='min-h-screen bg-gradient-to-br from-gray-50 via-white to-sky-50/30'>
@@ -121,8 +133,8 @@ export default function SpotsPage() {
             <h1 className='text-3xl font-bold text-gray-900 mb-4'>Oops! Something went wrong</h1>
             <p className='text-red-600 mb-4 font-medium'>Failed to load spots</p>
             <p className='text-gray-600 mb-8'>{handleApiError(error)}</p>
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className='bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-lg'
             >
               Try Again
@@ -152,8 +164,8 @@ export default function SpotsPage() {
 
           {/* Action Button */}
           {isAuthenticated ? (
-            <Link 
-              href='/spots/add' 
+            <Link
+              href='/spots/add'
               className='inline-flex items-center px-6 py-3 bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-700 hover:to-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group'
             >
               <span className='text-lg mr-2 group-hover:rotate-90 transition-transform duration-300'>+</span>
@@ -164,8 +176,8 @@ export default function SpotsPage() {
             <div className='bg-white border border-sky-100 rounded-xl p-4 max-w-sm mx-auto shadow-md hover:shadow-lg transition-shadow duration-300'>
               <div className='text-3xl mb-2'>🎯</div>
               <p className='text-gray-700 mb-4 font-semibold text-sm'>Know an epic spot?</p>
-              <Link 
-                href='/auth/register' 
+              <Link
+                href='/auth/register'
                 className='inline-flex items-center px-4 py-2 bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-700 hover:to-emerald-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-sm'
               >
                 Join & Add Spots
@@ -256,7 +268,14 @@ export default function SpotsPage() {
           </div>
         )}
 
-        {/* Spots Grid */}
+        {/* View Toggle */}
+        {uniqueSpots.length > 0 && (
+          <div className='flex justify-center mb-8'>
+            <MapToggle view={view} onViewChange={setView} />
+          </div>
+        )}
+
+        {/* Content */}
         {uniqueSpots.length === 0 ? (
           <div className='text-center py-12'>
             <div className='w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center'>
@@ -271,116 +290,198 @@ export default function SpotsPage() {
                 : 'No spots available yet. Help build the community!'}
             </p>
             {!isAuthenticated && (
-              <Link 
-                href='/auth/register' 
+              <Link
+                href='/auth/register'
                 className='inline-flex items-center px-6 py-3 bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-700 hover:to-emerald-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300'
               >
-                Be the first to add a spot! 
+                Be the first to add a spot!
                 <span className='ml-2'>🚀</span>
               </Link>
             )}
           </div>
         ) : (
           <>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12'>
-              {uniqueSpots.map((spot: Spot, index: number) => (
-                <div
-                  key={spot.id}
-                  className='group bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 hover:border-sky-200 overflow-hidden transform hover:scale-[1.02] transition-all duration-300'
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  {/* Card Header */}
-                  <div className='bg-gradient-to-br from-sky-500 to-emerald-500 p-4 text-white'>
-                    <div className='flex justify-between items-start mb-3'>
-                      <h3 className='text-lg font-bold truncate pr-2 group-hover:scale-105 transition-transform duration-300'>
-                        {spot.name}
-                      </h3>
-                      <div className='flex-shrink-0'>
-                        <span className='px-2 py-1 text-xs font-bold rounded-full shadow-sm backdrop-blur-sm bg-white/20 border border-white/30 text-white'>
-                          {spot.difficulty_level === 1 && '🟢'}
-                          {spot.difficulty_level === 2 && '🔵'}
-                          {spot.difficulty_level === 3 && '🟡'}
-                          {spot.difficulty_level === 4 && '🟠'}
-                          {spot.difficulty_level === 5 && '🔴'}
-                        </span>
+            {view === 'map' ? (
+              // Map View
+              <div className='mb-12'>
+                <GoogleMap
+                  spots={uniqueSpots}
+                  center={location || undefined}
+                  zoom={location ? 13 : 10}
+                  onSpotClick={setSelectedSpot}
+                  className='w-full h-[600px]'
+                />
+
+                {/* Selected Spot Info */}
+                {selectedSpot && (
+                  <div className='mt-6 bg-white rounded-xl shadow-lg border border-gray-200 p-6'>
+                    <div className='flex items-start justify-between mb-4'>
+                      <div>
+                        <h3 className='text-2xl font-bold text-gray-900 mb-2'>{selectedSpot.name}</h3>
+                        <div className='flex items-center space-x-3 mb-3'>
+                          <span className='px-3 py-1 text-sm font-bold rounded-full bg-sky-100 text-sky-800'>
+                            {selectedSpot.spot_type === 'street' && '🏙️ Street'}
+                            {selectedSpot.spot_type === 'park' && '🏞️ Park'}
+                            {selectedSpot.spot_type === 'bowl' && '🥣 Bowl'}
+                            {selectedSpot.spot_type === 'vert' && '📐 Vert'}
+                            {selectedSpot.spot_type === 'mini_ramp' && '🛹 Mini Ramp'}
+                            {selectedSpot.spot_type === 'ledge' && '📏 Ledge'}
+                            {selectedSpot.spot_type === 'stair' && '🪜 Stairs'}
+                            {selectedSpot.spot_type === 'rail' && '🚃 Rail'}
+                            {selectedSpot.spot_type === 'gap' && '↗️ Gap'}
+                            {selectedSpot.spot_type === 'other' && '⭐ Other'}
+                          </span>
+                          <span className='px-3 py-1 text-sm font-bold rounded-full bg-emerald-100 text-emerald-800'>
+                            {selectedSpot.difficulty_level === 1 && '🟢 Beginner'}
+                            {selectedSpot.difficulty_level === 2 && '🔵 Intermediate'}
+                            {selectedSpot.difficulty_level === 3 && '🟡 Advanced'}
+                            {selectedSpot.difficulty_level === 4 && '🟠 Expert'}
+                            {selectedSpot.difficulty_level === 5 && '🔴 Pro'}
+                          </span>
+                        </div>
                       </div>
+                      <button onClick={() => setSelectedSpot(null)} className='text-gray-400 hover:text-gray-600 p-2'>
+                        <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                        </svg>
+                      </button>
                     </div>
 
-                    <div className='flex items-center'>
-                      <span className='bg-white/20 backdrop-blur-sm text-white px-3 py-1 text-xs font-bold rounded-full border border-white/30'>
-                        {spot.spot_type === 'street' && '🏙️ Street'}
-                        {spot.spot_type === 'park' && '🏞️ Park'}
-                        {spot.spot_type === 'bowl' && '🥣 Bowl'}
-                        {spot.spot_type === 'vert' && '📐 Vert'}
-                        {spot.spot_type === 'mini_ramp' && '🛹 Mini Ramp'}
-                        {spot.spot_type === 'ledge' && '📏 Ledge'}
-                        {spot.spot_type === 'stair' && '🪜 Stairs'}
-                        {spot.spot_type === 'rail' && '🚃 Rail'}
-                        {spot.spot_type === 'gap' && '↗️ Gap'}
-                        {spot.spot_type === 'other' && '⭐ Other'}
-                      </span>
-                    </div>
-                  </div>
+                    {selectedSpot.description && <p className='text-gray-700 mb-4 leading-relaxed'>{selectedSpot.description}</p>}
 
-                  {/* Card Body */}
-                  <div className='p-4'>
-                    {spot.description && (
-                      <p className='text-gray-700 mb-4 leading-relaxed text-sm line-clamp-2 font-medium'>
-                        {spot.description}
-                      </p>
-                    )}
-
-                    {spot.address && (
-                      <div className='flex items-center text-gray-600 mb-4 bg-gray-50 rounded-lg px-3 py-2 border border-gray-100'>
-                        <span className='text-sky-500 mr-2'>📍</span>
-                        <span className='text-xs font-semibold truncate'>{spot.address}</span>
+                    {selectedSpot.address && (
+                      <div className='flex items-center text-gray-600 mb-4 bg-gray-50 rounded-lg px-4 py-3'>
+                        <span className='text-sky-500 mr-3'>📍</span>
+                        <span className='font-semibold'>{selectedSpot.address}</span>
                       </div>
                     )}
 
-                    {spot.features && spot.features.length > 0 && (
+                    {selectedSpot.features && selectedSpot.features.length > 0 && (
                       <div className='mb-4'>
-                        <div className='flex flex-wrap gap-1'>
-                          {spot.features.slice(0, 2).map((feature, featureIndex) => (
+                        <h4 className='text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide'>Features</h4>
+                        <div className='flex flex-wrap gap-2'>
+                          {selectedSpot.features.map((feature, index) => (
                             <span
-                              key={featureIndex}
-                              className='bg-gradient-to-r from-sky-100 to-emerald-100 text-sky-700 border border-sky-200 px-2 py-1 text-xs font-bold rounded-full'
+                              key={index}
+                              className='bg-gradient-to-r from-sky-100 to-emerald-100 text-sky-700 border border-sky-200 px-3 py-1 text-sm font-bold rounded-full'
                             >
                               ⚡ {feature}
                             </span>
                           ))}
-                          {spot.features.length > 2 && (
-                            <span className='text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full font-semibold border border-gray-200'>
-                              +{spot.features.length - 2}
-                            </span>
-                          )}
                         </div>
                       </div>
                     )}
 
-                    {/* Action Button */}
                     <Link
-                      href={`/spots/${spot.id}`}
-                      className='inline-flex items-center justify-center w-full bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-700 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 group text-sm'
+                      href={`/spots/${selectedSpot.id}`}
+                      className='inline-flex items-center px-6 py-3 bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-700 hover:to-emerald-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300'
                     >
-                      View Details
-                      <span className='ml-2 group-hover:translate-x-1 transition-transform duration-300'>→</span>
+                      View Full Details
+                      <span className='ml-2'>→</span>
                     </Link>
                   </div>
+                )}
+              </div>
+            ) : (
+              // List View
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12'>
+                {uniqueSpots.map((spot: Spot, index: number) => (
+                  <div
+                    key={spot.id}
+                    className='group bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 hover:border-sky-200 overflow-hidden transform hover:scale-[1.02] transition-all duration-300'
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    {/* Card Header */}
+                    <div className='bg-gradient-to-br from-sky-500 to-emerald-500 p-4 text-white'>
+                      <div className='flex justify-between items-start mb-3'>
+                        <h3 className='text-lg font-bold truncate pr-2 group-hover:scale-105 transition-transform duration-300'>
+                          {spot.name}
+                        </h3>
+                        <div className='flex-shrink-0'>
+                          <span className='px-2 py-1 text-xs font-bold rounded-full shadow-sm backdrop-blur-sm bg-white/20 border border-white/30 text-white'>
+                            {spot.difficulty_level === 1 && '🟢'}
+                            {spot.difficulty_level === 2 && '🔵'}
+                            {spot.difficulty_level === 3 && '🟡'}
+                            {spot.difficulty_level === 4 && '🟠'}
+                            {spot.difficulty_level === 5 && '🔴'}
+                          </span>
+                        </div>
+                      </div>
 
-                  {/* Guest Prompt */}
-                  {!isAuthenticated && (
-                    <div className='bg-gradient-to-r from-gray-50 to-sky-50 px-4 py-3 border-t border-gray-100'>
-                      <p className='text-xs text-gray-700 font-medium text-center'>
-                        <Link href='/auth/register' className='text-sky-600 hover:text-sky-700 font-bold hover:underline'>
-                          Join now
-                        </Link>{' '}
-                        to check in! 📸
-                      </p>
+                      <div className='flex items-center'>
+                        <span className='bg-white/20 backdrop-blur-sm text-white px-3 py-1 text-xs font-bold rounded-full border border-white/30'>
+                          {spot.spot_type === 'street' && '🏙️ Street'}
+                          {spot.spot_type === 'park' && '🏞️ Park'}
+                          {spot.spot_type === 'bowl' && '🥣 Bowl'}
+                          {spot.spot_type === 'vert' && '📐 Vert'}
+                          {spot.spot_type === 'mini_ramp' && '🛹 Mini Ramp'}
+                          {spot.spot_type === 'ledge' && '📏 Ledge'}
+                          {spot.spot_type === 'stair' && '🪜 Stairs'}
+                          {spot.spot_type === 'rail' && '🚃 Rail'}
+                          {spot.spot_type === 'gap' && '↗️ Gap'}
+                          {spot.spot_type === 'other' && '⭐ Other'}
+                        </span>
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+
+                    {/* Card Body */}
+                    <div className='p-4'>
+                      {spot.description && (
+                        <p className='text-gray-700 mb-4 leading-relaxed text-sm line-clamp-2 font-medium'>{spot.description}</p>
+                      )}
+
+                      {spot.address && (
+                        <div className='flex items-center text-gray-600 mb-4 bg-gray-50 rounded-lg px-3 py-2 border border-gray-100'>
+                          <span className='text-sky-500 mr-2'>📍</span>
+                          <span className='text-xs font-semibold truncate'>{spot.address}</span>
+                        </div>
+                      )}
+
+                      {spot.features && spot.features.length > 0 && (
+                        <div className='mb-4'>
+                          <div className='flex flex-wrap gap-1'>
+                            {spot.features.slice(0, 2).map((feature, featureIndex) => (
+                              <span
+                                key={featureIndex}
+                                className='bg-gradient-to-r from-sky-100 to-emerald-100 text-sky-700 border border-sky-200 px-2 py-1 text-xs font-bold rounded-full'
+                              >
+                                ⚡ {feature}
+                              </span>
+                            ))}
+                            {spot.features.length > 2 && (
+                              <span className='text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full font-semibold border border-gray-200'>
+                                +{spot.features.length - 2}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Action Button */}
+                      <Link
+                        href={`/spots/${spot.id}`}
+                        className='inline-flex items-center justify-center w-full bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-700 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 group text-sm'
+                      >
+                        View Details
+                        <span className='ml-2 group-hover:translate-x-1 transition-transform duration-300'>→</span>
+                      </Link>
+                    </div>
+
+                    {/* Guest Prompt */}
+                    {!isAuthenticated && (
+                      <div className='bg-gradient-to-r from-gray-50 to-sky-50 px-4 py-3 border-t border-gray-100'>
+                        <p className='text-xs text-gray-700 font-medium text-center'>
+                          <Link href='/auth/register' className='text-sky-600 hover:text-sky-700 font-bold hover:underline'>
+                            Join now
+                          </Link>{' '}
+                          to check in! 📸
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -413,7 +514,10 @@ export default function SpotsPage() {
             <h3 className='text-xl font-bold mb-2'>Ready to skate?</h3>
             <p className='text-gray-300 mb-4 text-sm'>Check in at spots, share photos, and connect with the local skate scene</p>
             <div className='space-x-3'>
-              <Link href='/auth/register' className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold'>
+              <Link
+                href='/auth/register'
+                className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold'
+              >
                 Sign Up Free
               </Link>
               <Link
