@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '../../../lib/stores/auth';
 import { spotsApi, handleApiError } from '../../../lib/api';
 import { ArrowLeftIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import MapSelector from '../../../components/maps/MapSelector';
 
 const SPOT_TYPES = [
   { value: 'street', label: 'Street' },
@@ -55,6 +56,30 @@ export default function AddSpotPage() {
   const [featureInput, setFeatureInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showMapSelector, setShowMapSelector] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Get user's current location for centering the map
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.log('Location access denied:', error);
+          // Default to NYC if location is denied
+          setUserLocation({ lat: 40.7128, lng: -74.006 });
+        }
+      );
+    } else {
+      // Default to NYC if geolocation is not supported
+      setUserLocation({ lat: 40.7128, lng: -74.006 });
+    }
+  }, []);
 
   // Redirect if not authenticated
   if (!authLoading && !isAuthenticated) {
@@ -100,12 +125,21 @@ export default function AddSpotPage() {
           toast.success('Location captured!');
         },
         (error) => {
-          toast.error('Unable to get location. Please enter coordinates manually.');
+          toast.error('Unable to get your location. Please enter coordinates manually.');
         }
       );
     } else {
       toast.error('Geolocation is not supported by this browser.');
     }
+  };
+
+  const handleMapLocationSelect = (location: { lat: number; lng: number }) => {
+    setFormData((prev) => ({
+      ...prev,
+      latitude: location.lat.toString(),
+      longitude: location.lng.toString(),
+    }));
+    toast.success('Location selected from map!');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -289,14 +323,50 @@ export default function AddSpotPage() {
                   {errors.longitude && <p className='mt-1 text-xs text-red-600'>{errors.longitude}</p>}
                 </div>
               </div>
-              <button
-                type='button'
-                onClick={handleGetLocation}
-                className='mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500'
-              >
-                <MapPinIcon className='h-4 w-4 mr-1' />
-                Use Current Location
-              </button>
+              
+              {/* Location Buttons */}
+              <div className='flex flex-wrap gap-2 mt-3'>
+                <button
+                  type='button'
+                  onClick={handleGetLocation}
+                  className='inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500'
+                >
+                  <MapPinIcon className='h-4 w-4 mr-1' />
+                  Use Current Location
+                </button>
+                
+                <button
+                  type='button'
+                  onClick={() => setShowMapSelector(!showMapSelector)}
+                  className='inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-emerald-700 bg-emerald-100 hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500'
+                >
+                  <svg className='h-4 w-4 mr-1' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7' />
+                  </svg>
+                  {showMapSelector ? 'Hide Map' : 'Select on Map'}
+                </button>
+              </div>
+
+              {/* Map Selector */}
+              {showMapSelector && userLocation && (
+                <div className='mt-4'>
+                  <div className='mb-2'>
+                    <p className='text-sm text-gray-600 mb-2'>Click on the map to select the spot location:</p>
+                  </div>
+                  <MapSelector
+                    center={userLocation}
+                    zoom={13}
+                    onLocationSelect={handleMapLocationSelect}
+                    selectedLocation={
+                      formData.latitude && formData.longitude
+                        ? { lat: parseFloat(formData.latitude), lng: parseFloat(formData.longitude) }
+                        : null
+                    }
+                    className='w-full h-80'
+                  />
+                </div>
+              )}
+
               {errors.location && <p className='mt-1 text-sm text-red-600'>{errors.location}</p>}
             </div>
 

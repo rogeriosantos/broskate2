@@ -141,13 +141,23 @@ export default function GoogleMap({
           title: spot.name,
           icon: {
             url: `data:image/svg+xml,${encodeURIComponent(`
-              <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="20" cy="20" r="18" fill="${DIFFICULTY_COLORS[spot.difficulty_level as keyof typeof DIFFICULTY_COLORS]}" stroke="white" stroke-width="3"/>
-                <text x="20" y="26" text-anchor="middle" font-size="16" fill="white">${icon}</text>
+              <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feDropShadow dx="2" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.5)"/>
+                  </filter>
+                </defs>
+                <polygon points="15,2 18.5,11 28,11 21.5,17 24,26 15,21 6,26 8.5,17 2,11 11.5,11" 
+                         fill="#FF8C00" 
+                         stroke="#FFD700" 
+                         stroke-width="2" 
+                         filter="url(#shadow)"/>
+                <polygon points="15,4 17.5,11.5 24,11.5 19.5,16 21,23 15,19.5 9,23 10.5,16 6,11.5 12.5,11.5" 
+                         fill="#FFD700"/>
               </svg>
             `)}`,
-            scaledSize: new google.maps.Size(40, 40),
-            anchor: new google.maps.Point(20, 20),
+            scaledSize: new google.maps.Size(30, 30),
+            anchor: new google.maps.Point(15, 15),
           },
         });
 
