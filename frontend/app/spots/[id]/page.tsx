@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { spotsApi, handleApiError } from '../../../lib/api';
 import { useAuthStore } from '../../../lib/stores/auth';
+import GoogleMap from '../../../components/maps/GoogleMap';
 
 interface Spot {
   id: number;
@@ -147,27 +148,26 @@ export default function SpotDetailsPage() {
         )}
       </div>
 
-      {/* Map Section (Placeholder) */}
+      {/* Map Section */}
       <div className='bg-white rounded-lg shadow-md p-6 mb-6'>
         <h2 className='text-xl font-semibold mb-4'>Location</h2>
-        <div className='bg-gray-100 rounded-lg h-64 flex items-center justify-center'>
-          <div className='text-center'>
-            <div className='text-4xl mb-2'>🗺️</div>
-            <p className='text-gray-600'>Interactive map coming soon</p>
-            <p className='text-sm text-gray-500'>
-              Lat: {spot.latitude.toFixed(4)}, Lng: {spot.longitude.toFixed(4)}
-            </p>
-            <div className='mt-4'>
-              <a
-                href={`https://maps.google.com?q=${spot.latitude},${spot.longitude}`}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-blue-600 hover:underline'
-              >
-                Open in Google Maps →
-              </a>
-            </div>
-          </div>
+        <div className='h-80 rounded-lg overflow-hidden'>
+          <GoogleMap 
+            spots={[spot]} 
+            center={{ lat: spot.latitude, lng: spot.longitude }}
+            zoom={15}
+          />
+        </div>
+        <div className='mt-4 text-sm text-gray-600 text-center'>
+          <p>Lat: {spot.latitude.toFixed(4)}, Lng: {spot.longitude.toFixed(4)}</p>
+          <a
+            href={`https://maps.google.com?q=${spot.latitude},${spot.longitude}`}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='text-blue-600 hover:underline inline-block mt-2'
+          >
+            Open in Google Maps →
+          </a>
         </div>
       </div>
 
